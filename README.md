@@ -88,8 +88,8 @@ RECENSIONI GOOGLE AUTOMATICHE
 
   Per attivarlo, una volta sola:
   1. Su https://console.cloud.google.com crea un progetto, attiva "Places API (New)" e la fatturazione
-     (obbligatoria per Google Maps Platform; la quota gratuita mensile copre ampiamente le 4 o 5
-     chiamate al mese di questo automatismo; imposta comunque un avviso di budget).
+     (obbligatoria per Google Maps Platform; la quota gratuita mensile copre ampiamente le circa 60
+     chiamate al mese di questo automatismo, due al giorno; imposta comunque un avviso di budget).
   2. Crea una chiave API (APIs & Services > Credentials) limitata alla sola "Places API (New)".
   3. Nel repository: Settings > Secrets and variables > Actions.
        Secrets   -> GOOGLE_PLACES_API_KEY = la chiave

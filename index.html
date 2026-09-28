@@ -716,13 +716,14 @@
       }
 
       // Giostra delle recensioni: scorrono da sole ogni CONFIG.recensioniRotazioneSec secondi. Si fermano mentre il
-      // mouse e' sopra, per 15 secondi dopo un tocco o un clic, mentre un elemento dentro ha il fuoco da tastiera, con il
-      // pulsante "Ferma", quando la scheda del browser e' nascosta, e non partono se il sistema chiede meno animazioni.
+      // mouse e' sopra le recensioni, per 15 secondi dopo che l'utente le ha sfogliate (frecce, puntini, dito o rotella),
+      // mentre un elemento dentro ha il fuoco da tastiera, con il pulsante "Ferma" e quando la scheda del browser e' nascosta.
+      // Se il sistema chiede meno animazioni, scorrono lo stesso ma cambiano di colpo, senza l'animazione di scorrimento.
       var giostra = {
         area: document.getElementById("recensioni-giostra"), track: document.getElementById("recensioni"),
         comandi: document.getElementById("recensioni-comandi"), punti: document.getElementById("recensioni-punti"),
         pausa: document.getElementById("recensioni-pausa"),
-        timer: null, indice: 0, posizioni: 1, pausaFino: 0, sopra: false, fuoco: false, fermata: false, ritardoScroll: null
+        timer: null, indice: 0, posizioni: 1, pausaFino: 0, animazioneFino: 0, sopra: false, fuoco: false, fermata: false, ritardoScroll: null
       };
       function pocheAnimazioni() { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
       function giostraCarte() { return Array.prototype.slice.call(giostra.track.querySelectorAll(".recensione")); }
@@ -737,6 +738,7 @@
         var c = giostraCarte(), n = giostra.posizioni;
         if (!c.length) return;
         giostra.indice = ((i % n) + n) % n;
+        giostra.animazioneFino = Date.now() + 1500;
         giostra.track.scrollTo({ left: c[giostra.indice].offsetLeft - c[0].offsetLeft, behavior: pocheAnimazioni() ? "auto" : "smooth" });
         giostraSegna();
       }
@@ -745,6 +747,7 @@
       }
       function giostraCostruisci() {
         var n = giostraPosizioni();
+        giostra.animazioneFino = Date.now() + 1500;
         if (n !== giostra.punti.children.length) {
           giostra.punti.textContent = "";
           for (var k = 0; k < n; k++) {
@@ -761,7 +764,7 @@
         giostraAvvia();
       }
       function giostraPausa() { giostra.pausaFino = Date.now() + 15000; }
-      function giostraAutomatica() { return (Number(CONFIG.recensioniRotazioneSec) || 0) > 0 && !pocheAnimazioni() && giostra.posizioni > 1; }
+      function giostraAutomatica() { return (Number(CONFIG.recensioniRotazioneSec) || 0) > 0 && giostra.posizioni > 1; }
       function giostraAvvia() {
         if (giostra.timer) { clearInterval(giostra.timer); giostra.timer = null; }
         giostra.pausa.hidden = !giostraAutomatica();
@@ -780,17 +783,17 @@
         giostra.pausa.setAttribute("aria-label", giostra.fermata ? "Riprendi lo scorrimento automatico" : "Ferma lo scorrimento automatico");
         giostra.pausa.querySelector("use").setAttribute("href", giostra.fermata ? "#i-riprendi" : "#i-pausa");
       });
-      // Scorrimento a mano (dito o rotella): la posizione si aggiorna quando lo scorrimento si ferma.
+      // Scorrimento a mano (dito o rotella): la posizione si aggiorna quando lo scorrimento si ferma e la giostra
+      // resta ferma 15 secondi. Uno scorrimento avviato dal codice (giostraVai) non conta come sfogliata dell'utente.
       giostra.track.addEventListener("scroll", function () {
+        if (Date.now() > giostra.animazioneFino) giostraPausa();
         clearTimeout(giostra.ritardoScroll);
         giostra.ritardoScroll = setTimeout(function () { giostra.indice = giostraIndiceDaScroll(); giostraSegna(); }, 150);
       });
-      giostra.track.addEventListener("pointerdown", giostraPausa);
-      giostra.track.addEventListener("touchstart", giostraPausa, { passive: true });
-      // Solo il mouse vero mette in pausa "finche' e' sopra" (sui telefoni un tocco simula mouseenter ma non mouseleave):
-      // a ogni movimento del mouse si ricalcola se il puntatore e' dentro l'area, e uscendo dalla finestra non lo e' piu'.
-      document.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") giostra.sopra = giostra.area.contains(e.target); });
-      giostra.area.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") giostra.sopra = false; });
+      // Solo il mouse vero mette in pausa "finche' e' sopra le recensioni" (sui telefoni un tocco simula mouseenter ma non
+      // mouseleave): a ogni movimento del mouse si ricalcola se il puntatore e' sopra la pista, e uscendo dalla finestra non lo e' piu'.
+      document.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") giostra.sopra = giostra.track.contains(e.target); });
+      giostra.track.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") giostra.sopra = false; });
       document.documentElement.addEventListener("mouseleave", function () { giostra.sopra = false; });
       // Il fuoco ferma lo scorrimento solo se arriva dalla tastiera (:focus-visible): un clic col mouse su un comando no.
       function fuocoDaTastiera() {
