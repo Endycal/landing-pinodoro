@@ -66,10 +66,15 @@ RECENSIONI GOOGLE AUTOMATICHE
   Google del Lido: ogni lunedi' mattina (7:23 ora italiana d'estate, 6:23 d'inverno) un automatismo
   (Actions > "Aggiorna le recensioni Google", lanciabile anche a mano in qualsiasi momento) interroga
   l'API ufficiale di Google Maps Platform (Places API), scrive recensioni.json e ripubblica la pagina.
-  Google espone al massimo 5 recensioni per scheda (le piu' rilevanti): lo script ne sceglie 3, con
+  Google espone al massimo 5 recensioni per scheda (le piu' rilevanti) e non permette di chiederne
+  altre. Per averne di piu' nella giostra, le recensioni che escono dalle 5 di Google restano nel file
+  per 30 giorni dall'ultima volta in cui Google le ha date (30 giorni e' il massimo consentito dalle
+  condizioni di Google per conservarle), fino a 12 in tutto. Lo script sceglie le 3 in evidenza con
   almeno 4 stelle, una per categoria del documento (lavoro/servizio, viaggio/famiglia, cibo), copiate
   parola per parola; oltre i 320 caratteri il testo viene accorciato e compare il link "Leggi tutto"
   verso la recensione su Google. I nomi vengono abbreviati a nome e iniziale (es. "Marco R.").
+  Nella giostra della pagina entrano tutte le recensioni del file con almeno 4 stelle
+  (CONFIG.recensioniStelleMinime in index.html: con 3 compaiono anche quelle da 3 stelle).
   Finche' l'automatismo non e' configurato, nella pagina restano i tre segnaposto.
 
   Per attivarlo, una volta sola:

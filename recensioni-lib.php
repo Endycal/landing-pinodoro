@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 const PLACE_ID_PREDEFINITO = 'ChIJcV_Xya3fOhMRWT5u9UL0X08'; // scheda "Ristorante Pino D'Oro", Mondragone
 const CAMPI = 'id,displayName,rating,userRatingCount,reviews,googleMapsUri';
+const MEMORIA_GIORNI = 30;             // le recensioni uscite dalle 5 di Google restano visibili fino a 30 giorni dall'ultima volta viste (limite di Google)
+const MASSIMO_TUTTE = 12;              // numero massimo di recensioni conservate nel file
 const TESTO_MAX = 320;                 // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
 const TESTO_MIN = 40;                  // recensioni piu' corte non vengono scelte
 const VALUTAZIONE_MIN = 4;             // recensioni con meno stelle non vengono scelte
@@ -174,16 +176,48 @@ function scegli(array $recensioni): array
     }, $scelte);
 }
 
-function normalizza(array $dati, string $placeId): array
+/** Identita' di una recensione: il suo link su Google (uno per recensione), altrimenti autore e testo. */
+function chiaveRecensione(array $r): string
 {
-    $tutte = [];
+    return (isset($r['link']) && str_contains((string) $r['link'], '/reviews/')) ? (string) $r['link'] : $r['autore'] . '|' . $r['testo'];
+}
+
+/** Unisce le recensioni scaricate con quelle del file precedente non piu' date da Google, tenute per MEMORIA_GIORNI. */
+function unisci(array $nuove, ?array $precedente, int $adesso): array
+{
+    $presenti = [];
+    foreach ($nuove as $r) {
+        $presenti[chiaveRecensione($r)] = true;
+    }
+    $ultimaLettura = strtotime((string) ($precedente['aggiornato'] ?? '')) ?: 0;
+    $conservate = [];
+    foreach ($precedente['tutte'] ?? [] as $r) {
+        if (!is_array($r) || isset($presenti[chiaveRecensione($r)])) {
+            continue;
+        }
+        $vista = strtotime((string) ($r['ultimaVoltaVista'] ?? '')) ?: $ultimaLettura;
+        if (!$vista || $adesso - $vista > MEMORIA_GIORNI * 86400) {
+            continue;
+        }
+        $r['ultimaVoltaVista'] = gmdate('Y-m-d\TH:i:s.v\Z', $vista);
+        $conservate[] = $r;
+    }
+    $tutte = array_merge($nuove, $conservate);
+    usort($tutte, static fn(array $a, array $b): int => strcmp((string) $b['data'], (string) $a['data']));
+    return array_slice($tutte, 0, MASSIMO_TUTTE);
+}
+
+function normalizza(array $dati, string $placeId, ?array $precedente = null, ?int $adesso = null): array
+{
+    $adesso = $adesso ?? time();
+    $scaricate = [];
     foreach ($dati['reviews'] ?? [] as $r) {
         $testoIntero = trim((string) preg_replace('/\s+/u', ' ', (string) ($r['text']['text'] ?? ($r['originalText']['text'] ?? ''))));
         if ($testoIntero === '') {
             continue;
         }
         [$testo, $troncata] = accorcia($testoIntero);
-        $tutte[] = [
+        $scaricate[] = [
             'autore' => nomeBreve($r['authorAttribution']['displayName'] ?? null),
             'valutazione' => (int) ($r['rating'] ?? 0),
             'testo' => $testo,
@@ -194,16 +228,21 @@ function normalizza(array $dati, string $placeId): array
             'link' => (string) ($r['googleMapsUri'] ?? ($dati['googleMapsUri'] ?? '')),
         ];
     }
+    $tutte = unisci($scaricate, $precedente, $adesso);
+    $perScelta = array_map(static function (array $r): array {
+        $r['testoIntero'] = $r['testoIntero'] ?? $r['testo'];
+        return $r;
+    }, $tutte);
     $valutazione = $dati['rating'] ?? null;
     $numero = $dati['userRatingCount'] ?? null;
     return [
-        'aggiornato' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z'),
+        'aggiornato' => gmdate('Y-m-d\TH:i:s', $adesso) . '.000Z',
         'placeId' => (string) ($dati['id'] ?? $placeId),
         'nome' => (string) ($dati['displayName']['text'] ?? ''),
         'googleMapsUri' => (string) ($dati['googleMapsUri'] ?? ''),
         'valutazione' => is_int($valutazione) || is_float($valutazione) ? $valutazione : null,
         'numeroRecensioni' => is_int($numero) ? $numero : null,
-        'scelte' => scegli($tutte),
+        'scelte' => scegli($perScelta),
         'tutte' => array_map(static function (array $r): array {
             unset($r['testoIntero']);
             return $r;
@@ -234,8 +273,9 @@ function aggiornaRecensioni(array $config, string $fixture = ''): array
         throw new RuntimeException("Manca api_key: copia config.example.php in config.php e inserisci la chiave di Google Maps Platform.");
     }
     $file = percorsoRecensioni();
-    $nuovo = normalizza(dettagli($chiave, $placeId, $fixture), $placeId);
     $precedente = is_file($file) ? json_decode((string) file_get_contents($file), true) : null;
+    $adesso = (PHP_SAPI === 'cli' && getenv('RECENSIONI_ADESSO')) ? (strtotime((string) getenv('RECENSIONI_ADESSO')) ?: time()) : time(); // solo per le prove
+    $nuovo = normalizza(dettagli($chiave, $placeId, $fixture), $placeId, is_array($precedente) ? $precedente : null, $adesso);
     $cambiato = !(is_array($precedente) && senzaData($precedente) === senzaData($nuovo));
     $temporaneo = $file . '.tmp';
     if (file_put_contents($temporaneo, codifica($nuovo)) === false || !rename($temporaneo, $file)) {

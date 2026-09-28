@@ -562,6 +562,8 @@
         },
         // Ogni quanti secondi le recensioni scorrono da sole (0 = ferme; frecce e puntini restano).
         recensioniRotazioneSec: 7,
+        // Stelle minime perche' una recensione entri nella giostra (4 = solo 4 e 5 stelle; 3 = anche quelle da 3).
+        recensioniStelleMinime: 4,
         // Titolo in base al parametro ?g= dei gruppi di annunci.
         titoli: {
           lavoro: "Pranzo sulla spiaggia, a 1 minuto dalla Domiziana. In un'ora sei di nuovo in strada.",
@@ -678,14 +680,17 @@
           document.getElementById("titolo-prova").textContent =
             dati.valutazione.toFixed(1).replace(".", ",") + " su Google, con " + dati.numeroRecensioni + " recensioni";
         }
-        // Nella giostra vanno le tre scelte e poi le altre recensioni utili (almeno 4 stelle, non troppo corte).
-        var carte = dati.scelte.slice(0, 3);
+        // Nella giostra vanno le tre scelte e poi tutte le altre recensioni del file con abbastanza stelle
+        // (CONFIG.recensioniStelleMinime), comprese quelle uscite dalle 5 di Google e conservate fino a 30 giorni.
+        var stelleMinime = Number(CONFIG.recensioniStelleMinime) || 0;
+        var carte = dati.scelte.slice(0, 3).filter(function (r) { return Number(r.valutazione) >= stelleMinime; });
         var viste = {};
         carte.forEach(function (r) { viste[r.autore + "|" + r.testo] = true; });
         (dati.tutte || []).forEach(function (r) {
           var chiave = r.autore + "|" + r.testo;
-          if (!viste[chiave] && Number(r.valutazione) >= 4 && String(r.testo || "").length >= 40) { viste[chiave] = true; carte.push(r); }
+          if (!viste[chiave] && Number(r.valutazione) >= stelleMinime && String(r.testo || "").length >= 20) { viste[chiave] = true; carte.push(r); }
         });
+        if (!carte.length) return;
         var contenitore = document.getElementById("recensioni");
         contenitore.textContent = "";
         carte.forEach(function (r) {

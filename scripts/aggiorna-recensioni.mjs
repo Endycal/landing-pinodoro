@@ -16,6 +16,8 @@ const PLACE_ID_PREDEFINITO = "ChIJcV_Xya3fOhMRWT5u9UL0X08"; // Place ID della sc
 const QUERY_PREDEFINITA = "Lido Pino d'Oro Mondragone"; // testo con cui cercare la scheda quando manca il Place ID
 const USCITA = new URL("../recensioni.json", import.meta.url);
 const CAMPI = "id,displayName,rating,userRatingCount,reviews,googleMapsUri";
+const MEMORIA_GIORNI = 30;  // le recensioni uscite dalle 5 di Google restano visibili fino a 30 giorni dall'ultima volta viste (limite di Google)
+const MASSIMO_TUTTE = 12;   // numero massimo di recensioni conservate nel file
 const TESTO_MAX = 320;      // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
 const TESTO_MIN = 40;       // recensioni piu' corte non vengono scelte
 const VALUTAZIONE_MIN = 4;  // recensioni con meno stelle non vengono scelte
@@ -103,8 +105,28 @@ function scegli(recensioni) {
   return scelte.map(({ testoIntero, ...r }) => r);
 }
 
-function normalizza(dati) {
-  const tutte = (dati.reviews || []).map((r) => {
+// Identita' di una recensione: il suo link su Google (uno per recensione), altrimenti autore e testo.
+function chiaveRecensione(r) {
+  return r.link && r.link.includes("/reviews/") ? r.link : `${r.autore}|${r.testo}`;
+}
+
+// Unisce le recensioni appena scaricate con quelle del file precedente non piu' restituite da Google,
+// tenendo queste ultime per MEMORIA_GIORNI dall'ultima volta in cui Google le aveva date.
+function unisci(nuove, precedente, adesso) {
+  const presenti = new Set(nuove.map(chiaveRecensione));
+  const ultimaLettura = Date.parse(precedente?.aggiornato || "") || 0;
+  const conservate = [];
+  for (const r of precedente?.tutte || []) {
+    if (presenti.has(chiaveRecensione(r))) continue;
+    const vista = Date.parse(r.ultimaVoltaVista || "") || ultimaLettura;
+    if (!vista || adesso - vista > MEMORIA_GIORNI * 86400000) continue;
+    conservate.push({ ...r, ultimaVoltaVista: new Date(vista).toISOString() });
+  }
+  return [...nuove, ...conservate].sort((a, b) => b.data.localeCompare(a.data)).slice(0, MASSIMO_TUTTE);
+}
+
+function normalizza(dati, precedente, adesso) {
+  const scaricate = (dati.reviews || []).map((r) => {
     const testoIntero = String(r.text?.text || r.originalText?.text || "").replace(/\s+/g, " ").trim();
     const { testo, troncata } = accorcia(testoIntero);
     return {
@@ -116,14 +138,15 @@ function normalizza(dati) {
       link: r.googleMapsUri || dati.googleMapsUri || "",
     };
   }).filter((r) => r.testoIntero);
+  const tutte = unisci(scaricate.map(({ testoIntero, ...r }) => ({ ...r, testoIntero })), precedente, adesso);
   return {
-    aggiornato: new Date().toISOString(),
+    aggiornato: new Date(adesso).toISOString(),
     placeId: dati.id || placeId || "",
     nome: dati.displayName?.text || "",
     googleMapsUri: dati.googleMapsUri || "",
     valutazione: typeof dati.rating === "number" ? dati.rating : null,
     numeroRecensioni: typeof dati.userRatingCount === "number" ? dati.userRatingCount : null,
-    scelte: scegli(tutte),
+    scelte: scegli(tutte.map((r) => ({ ...r, testoIntero: r.testoIntero ?? r.testo }))),
     tutte: tutte.map(({ testoIntero, ...r }) => r),
   };
 }
@@ -135,8 +158,9 @@ if (!chiave && !fixture) {
   process.exit(0);
 }
 
-const nuovo = normalizza(await dettagli());
 const precedente = existsSync(USCITA) ? JSON.parse(readFileSync(USCITA, "utf8")) : null;
+const adesso = Date.parse(process.env.RECENSIONI_ADESSO || "") || Date.now(); // RECENSIONI_ADESSO: solo per le prove
+const nuovo = normalizza(await dettagli(), precedente, adesso);
 if (precedente && senzaData(precedente) === senzaData(nuovo)) {
   console.log(`Nessuna novita': ${nuovo.valutazione} su Google, ${nuovo.numeroRecensioni} recensioni, ${nuovo.scelte.length} mostrate.`);
   process.exit(0);
