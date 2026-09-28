@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 const PLACE_ID_PREDEFINITO = 'ChIJcV_Xya3fOhMRWT5u9UL0X08'; // scheda "Ristorante Pino D'Oro", Mondragone
 const CAMPI = 'id,displayName,rating,userRatingCount,reviews,googleMapsUri';
+const LINGUE = ['it', 'en'];           // Google da' 5 recensioni per lingua: la prima e' la principale (voto, conteggio, testi in italiano),
+                                       // le altre aggiungono le recensioni scritte in quella lingua, mostrate nella loro lingua.
 const MEMORIA_GIORNI = 30;             // le recensioni uscite dalle 5 di Google restano visibili fino a 30 giorni dall'ultima volta viste (limite di Google)
 const MASSIMO_TUTTE = 12;              // numero massimo di recensioni conservate nel file
 const TESTO_MAX = 320;                 // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
@@ -60,9 +62,15 @@ function etaRecensioni(): ?int
 }
 
 // ---------------------------------------------------------------- lettura dalla scheda Google
-function dettagli(string $chiave, string $placeId, string $fixture): array
+function dettagli(string $chiave, string $placeId, string $fixture, string $lingua = 'it'): array
 {
     if ($fixture !== '') {
+        if ($lingua !== LINGUE[0]) { // prove senza rete: PLACES_FIXTURE_EN ecc. per le altre lingue
+            $fixture = (string) getenv('PLACES_FIXTURE_' . strtoupper($lingua));
+            if ($fixture === '') {
+                return ['reviews' => []];
+            }
+        }
         $contenuto = @file_get_contents($fixture);
         if ($contenuto === false) {
             throw new RuntimeException('Risposta di prova non leggibile: ' . $fixture);
@@ -73,12 +81,12 @@ function dettagli(string $chiave, string $placeId, string $fixture): array
         }
         return $dati;
     }
-    $url = 'https://places.googleapis.com/v1/places/' . rawurlencode($placeId) . '?languageCode=it&regionCode=IT';
+    $url = 'https://places.googleapis.com/v1/places/' . rawurlencode($placeId) . '?languageCode=' . rawurlencode($lingua) . '&regionCode=IT';
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => TIMEOUT_SEC,
-        CURLOPT_HTTPHEADER => ['X-Goog-Api-Key: ' . $chiave, 'X-Goog-FieldMask: ' . CAMPI, 'Accept: application/json'],
+        CURLOPT_HTTPHEADER => ['X-Goog-Api-Key: ' . $chiave, 'X-Goog-FieldMask: ' . ($lingua === LINGUE[0] ? CAMPI : 'reviews'), 'Accept: application/json'],
     ]);
     $corpo = curl_exec($ch);
     $errore = curl_error($ch);
@@ -95,6 +103,35 @@ function dettagli(string $chiave, string $placeId, string $fixture): array
         throw new RuntimeException('Risposta di Google non leggibile.');
     }
     return $dati;
+}
+
+/** Tempo trascorso in italiano ("3 settimane fa"), uguale per tutte le lingue. */
+function quandoItaliano(string $publishTime, int $adesso): string
+{
+    $t = strtotime($publishTime);
+    if (!$t) {
+        return '';
+    }
+    $giorni = max(0, intdiv($adesso - $t, 86400));
+    if ($giorni < 1) {
+        return 'oggi';
+    }
+    if ($giorni === 1) {
+        return 'ieri';
+    }
+    if ($giorni < 7) {
+        return "$giorni giorni fa";
+    }
+    $settimane = intdiv($giorni, 7);
+    if ($giorni < 30) {
+        return $settimane === 1 ? 'una settimana fa' : "$settimane settimane fa";
+    }
+    $mesi = (int) floor($giorni / 30.44);
+    if ($giorni < 365) {
+        return $mesi <= 1 ? 'un mese fa' : "$mesi mesi fa";
+    }
+    $anni = (int) floor($giorni / 365.25);
+    return $anni <= 1 ? 'un anno fa' : "$anni anni fa";
 }
 
 // ---------------------------------------------------------------- selezione (identica allo script Node)
@@ -159,8 +196,9 @@ function scegli(array $recensioni): array
         }
     }
     $ordine = array_keys($valide);
+    $italiana = static fn(array $r): int => (($r['lingua'] ?? LINGUE[0]) === LINGUE[0]) ? 1 : 0;
     usort($ordine, static fn(int $a, int $b): int =>
-        [$valide[$b]['valutazione'], $valide[$b]['data']] <=> [$valide[$a]['valutazione'], $valide[$a]['data']]);
+        [$italiana($valide[$b]), $valide[$b]['valutazione'], $valide[$b]['data']] <=> [$italiana($valide[$a]), $valide[$a]['valutazione'], $valide[$a]['data']]);
     foreach ($ordine as $i) {
         if (count($scelte) >= 3) {
             break;
@@ -207,26 +245,50 @@ function unisci(array $nuove, ?array $precedente, int $adesso): array
     return array_slice($tutte, 0, MASSIMO_TUTTE);
 }
 
-function normalizza(array $dati, string $placeId, ?array $precedente = null, ?int $adesso = null): array
+function normalizza(array $dati, array $extra, string $placeId, ?array $precedente = null, ?int $adesso = null): array
 {
     $adesso = $adesso ?? time();
-    $scaricate = [];
-    foreach ($dati['reviews'] ?? [] as $r) {
+    $converti = static function (array $r, string $lingua) use ($dati, $adesso): ?array {
         $testoIntero = trim((string) preg_replace('/\s+/u', ' ', (string) ($r['text']['text'] ?? ($r['originalText']['text'] ?? ''))));
         if ($testoIntero === '') {
-            continue;
+            return null;
         }
         [$testo, $troncata] = accorcia($testoIntero);
-        $scaricate[] = [
+        return [
             'autore' => nomeBreve($r['authorAttribution']['displayName'] ?? null),
             'valutazione' => (int) ($r['rating'] ?? 0),
             'testo' => $testo,
             'troncata' => $troncata,
             'testoIntero' => $testoIntero,
-            'quando' => (string) ($r['relativePublishTimeDescription'] ?? ''),
+            'quando' => quandoItaliano((string) ($r['publishTime'] ?? ''), $adesso),
             'data' => (string) ($r['publishTime'] ?? ''),
             'link' => (string) ($r['googleMapsUri'] ?? ($dati['googleMapsUri'] ?? '')),
+            'lingua' => $lingua,
         ];
+    };
+    // Lingua principale: tutto (i testi sono in italiano, tradotti da Google se serve).
+    $scaricate = [];
+    $presenti = [];
+    foreach ($dati['reviews'] ?? [] as $r) {
+        $c = $converti($r, LINGUE[0]);
+        if ($c) {
+            $scaricate[] = $c;
+            $presenti[chiaveRecensione($c)] = true;
+        }
+    }
+    // Altre lingue: solo le recensioni scritte davvero in quella lingua e non gia' presenti.
+    foreach ($extra as $blocco) {
+        foreach ($blocco['reviews'] ?? [] as $r) {
+            if ((string) ($r['originalText']['languageCode'] ?? '') !== $blocco['lingua']) {
+                continue;
+            }
+            $c = $converti($r, $blocco['lingua']);
+            if (!$c || isset($presenti[chiaveRecensione($c)])) {
+                continue;
+            }
+            $presenti[chiaveRecensione($c)] = true;
+            $scaricate[] = $c;
+        }
     }
     $tutte = unisci($scaricate, $precedente, $adesso);
     $perScelta = array_map(static function (array $r): array {
@@ -275,7 +337,12 @@ function aggiornaRecensioni(array $config, string $fixture = ''): array
     $file = percorsoRecensioni();
     $precedente = is_file($file) ? json_decode((string) file_get_contents($file), true) : null;
     $adesso = (PHP_SAPI === 'cli' && getenv('RECENSIONI_ADESSO')) ? (strtotime((string) getenv('RECENSIONI_ADESSO')) ?: time()) : time(); // solo per le prove
-    $nuovo = normalizza(dettagli($chiave, $placeId, $fixture), $placeId, is_array($precedente) ? $precedente : null, $adesso);
+    $base = dettagli($chiave, $placeId, $fixture, LINGUE[0]);
+    $extra = [];
+    foreach (array_slice(LINGUE, 1) as $lingua) {
+        $extra[] = ['lingua' => $lingua, 'reviews' => dettagli($chiave, $placeId, $fixture, $lingua)['reviews'] ?? []];
+    }
+    $nuovo = normalizza($base, $extra, $placeId, is_array($precedente) ? $precedente : null, $adesso);
     $cambiato = !(is_array($precedente) && senzaData($precedente) === senzaData($nuovo));
     $temporaneo = $file . '.tmp';
     if (file_put_contents($temporaneo, codifica($nuovo)) === false || !rename($temporaneo, $file)) {

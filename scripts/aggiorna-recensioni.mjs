@@ -16,6 +16,8 @@ const PLACE_ID_PREDEFINITO = "ChIJcV_Xya3fOhMRWT5u9UL0X08"; // Place ID della sc
 const QUERY_PREDEFINITA = "Lido Pino d'Oro Mondragone"; // testo con cui cercare la scheda quando manca il Place ID
 const USCITA = new URL("../recensioni.json", import.meta.url);
 const CAMPI = "id,displayName,rating,userRatingCount,reviews,googleMapsUri";
+const LINGUE = ["it", "en"]; // Google da' 5 recensioni per lingua: la prima e' la principale (voto, conteggio, testi in italiano),
+                             // le altre aggiungono le recensioni scritte in quella lingua, mostrate nella loro lingua.
 const MEMORIA_GIORNI = 30;  // le recensioni uscite dalle 5 di Google restano visibili fino a 30 giorni dall'ultima volta viste (limite di Google)
 const MASSIMO_TUTTE = 12;   // numero massimo di recensioni conservate nel file
 const TESTO_MAX = 320;      // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
@@ -59,12 +61,31 @@ async function trovaPlaceId() {
   return primo.id;
 }
 
-async function dettagli() {
-  if (fixture) return JSON.parse(readFileSync(fixture, "utf8"));
+async function dettagli(lingua) {
+  if (fixture) { // prove senza rete: PLACES_FIXTURE per la lingua principale, PLACES_FIXTURE_EN ecc. per le altre (se mancano, nessuna recensione)
+    const file = lingua === LINGUE[0] ? fixture : process.env[`PLACES_FIXTURE_${lingua.toUpperCase()}`];
+    return file ? JSON.parse(readFileSync(file, "utf8")) : { reviews: [] };
+  }
   if (!placeId && query) placeId = await trovaPlaceId();
   if (!placeId) throw new Error("Manca il Place ID: imposta GOOGLE_PLACE_ID (o GOOGLE_PLACE_QUERY per cercarlo).");
-  const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=it&regionCode=IT`;
-  return chiama(url, { campi: CAMPI });
+  const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=${lingua}&regionCode=IT`;
+  return chiama(url, { campi: lingua === LINGUE[0] ? CAMPI : "reviews" });
+}
+
+// Tempo trascorso in italiano ("3 settimane fa"), uguale per tutte le lingue.
+function quandoItaliano(publishTime, adesso) {
+  const t = Date.parse(publishTime || "");
+  if (!t) return "";
+  const giorni = Math.max(0, Math.floor((adesso - t) / 86400000));
+  if (giorni < 1) return "oggi";
+  if (giorni === 1) return "ieri";
+  if (giorni < 7) return `${giorni} giorni fa`;
+  const settimane = Math.floor(giorni / 7);
+  if (giorni < 30) return settimane === 1 ? "una settimana fa" : `${settimane} settimane fa`;
+  const mesi = Math.floor(giorni / 30.44);
+  if (giorni < 365) return mesi <= 1 ? "un mese fa" : `${mesi} mesi fa`;
+  const anni = Math.floor(giorni / 365.25);
+  return anni <= 1 ? "un anno fa" : `${anni} anni fa`;
 }
 
 function nomeBreve(nome) {
@@ -98,7 +119,8 @@ function scegli(recensioni) {
     }
     if (migliore) { usate.add(migliore); scelte.push({ ...migliore, categoria: categoria.id }); }
   }
-  for (const r of [...valide].sort((a, b) => b.valutazione - a.valutazione || b.data.localeCompare(a.data))) {
+  const italiana = (r) => (r.lingua === LINGUE[0] ? 1 : 0);
+  for (const r of [...valide].sort((a, b) => italiana(b) - italiana(a) || b.valutazione - a.valutazione || b.data.localeCompare(a.data))) {
     if (scelte.length >= 3) break;
     if (!usate.has(r)) { usate.add(r); scelte.push({ ...r, categoria: "altro" }); }
   }
@@ -125,19 +147,33 @@ function unisci(nuove, precedente, adesso) {
   return [...nuove, ...conservate].sort((a, b) => b.data.localeCompare(a.data)).slice(0, MASSIMO_TUTTE);
 }
 
-function normalizza(dati, precedente, adesso) {
-  const scaricate = (dati.reviews || []).map((r) => {
+function normalizza(dati, extra, precedente, adesso) {
+  const converti = (r, lingua) => {
     const testoIntero = String(r.text?.text || r.originalText?.text || "").replace(/\s+/g, " ").trim();
     const { testo, troncata } = accorcia(testoIntero);
     return {
       autore: nomeBreve(r.authorAttribution?.displayName),
       valutazione: Number(r.rating) || 0,
       testo, troncata, testoIntero,
-      quando: r.relativePublishTimeDescription || "",
+      quando: quandoItaliano(r.publishTime, adesso),
       data: r.publishTime || "",
       link: r.googleMapsUri || dati.googleMapsUri || "",
+      lingua,
     };
-  }).filter((r) => r.testoIntero);
+  };
+  // Lingua principale: tutto (i testi sono in italiano, tradotti da Google se serve).
+  const scaricate = (dati.reviews || []).map((r) => converti(r, LINGUE[0])).filter((r) => r.testoIntero);
+  // Altre lingue: solo le recensioni scritte davvero in quella lingua e non gia' presenti.
+  const presenti = new Set(scaricate.map(chiaveRecensione));
+  for (const { lingua, reviews } of extra) {
+    for (const r of reviews) {
+      if ((r.originalText?.languageCode || "") !== lingua) continue;
+      const c = converti(r, lingua);
+      if (!c.testoIntero || presenti.has(chiaveRecensione(c))) continue;
+      presenti.add(chiaveRecensione(c));
+      scaricate.push(c);
+    }
+  }
   const tutte = unisci(scaricate.map(({ testoIntero, ...r }) => ({ ...r, testoIntero })), precedente, adesso);
   return {
     aggiornato: new Date(adesso).toISOString(),
@@ -160,7 +196,10 @@ if (!chiave && !fixture) {
 
 const precedente = existsSync(USCITA) ? JSON.parse(readFileSync(USCITA, "utf8")) : null;
 const adesso = Date.parse(process.env.RECENSIONI_ADESSO || "") || Date.now(); // RECENSIONI_ADESSO: solo per le prove
-const nuovo = normalizza(await dettagli(), precedente, adesso);
+const base = await dettagli(LINGUE[0]);
+const extra = [];
+for (const lingua of LINGUE.slice(1)) extra.push({ lingua, reviews: (await dettagli(lingua)).reviews || [] });
+const nuovo = normalizza(base, extra, precedente, adesso);
 if (precedente && senzaData(precedente) === senzaData(nuovo)) {
   console.log(`Nessuna novita': ${nuovo.valutazione} su Google, ${nuovo.numeroRecensioni} recensioni, ${nuovo.scelte.length} mostrate.`);
   process.exit(0);

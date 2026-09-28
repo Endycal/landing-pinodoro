@@ -563,7 +563,7 @@
         // Ogni quanti secondi le recensioni scorrono da sole (0 = ferme; frecce e puntini restano).
         recensioniRotazioneSec: 7,
         // Stelle minime perche' una recensione entri nella giostra (4 = solo 4 e 5 stelle; 3 = anche quelle da 3).
-        recensioniStelleMinime: 3,
+        recensioniStelleMinime: 4,
         // Titolo in base al parametro ?g= dei gruppi di annunci.
         titoli: {
           lavoro: "Pranzo sulla spiaggia, a 1 minuto dalla Domiziana. In un'ora sei di nuovo in strada.",
@@ -705,7 +705,9 @@
             leggi.href = r.link; leggi.target = "_blank"; leggi.rel = "noopener"; leggi.textContent = "Leggi tutto";
             p.appendChild(document.createTextNode(" ")); p.appendChild(leggi);
           }
-          var cite = document.createElement("cite"); cite.textContent = r.autore + (r.quando ? " · " + r.quando : "");
+          var NOMI_LINGUE = { en: "in inglese", de: "in tedesco", fr: "in francese", es: "in spagnolo" };
+          var lingua = r.lingua && r.lingua !== "it" ? (NOMI_LINGUE[r.lingua] || "in " + r.lingua) : "";
+          var cite = document.createElement("cite"); cite.textContent = r.autore + (r.quando ? " · " + r.quando : "") + (lingua ? " · " + lingua : "");
           scheda.appendChild(stelle); scheda.appendChild(p); scheda.appendChild(cite);
           contenitore.appendChild(scheda);
         });
