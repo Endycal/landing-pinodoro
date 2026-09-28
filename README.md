@@ -14,6 +14,7 @@ COSA C'E' IN QUESTO REPOSITORY
   scripts/        lo script che scarica le recensioni da Google (versione per GitHub Actions)
   recensioni.php            su Hostinger risponde al posto di recensioni.json e lo rinnova da Google ogni settimana
   aggiorna-recensioni.php   aggiornamento forzato (cron di hPanel o browser con token), per Hostinger
+  recensioni-escluse.txt    elenco manuale delle recensioni da non mostrare mai
   recensioni-lib.php        funzioni comuni ai due file PHP
   config.example.php        modello del file con la chiave, solo per Hostinger
   .htaccess       regole di protezione per Hostinger (GitHub Pages le ignora)
@@ -76,6 +77,11 @@ RECENSIONI GOOGLE AUTOMATICHE
   almeno 4 stelle, una per categoria del documento (lavoro/servizio, viaggio/famiglia, cibo), copiate
   parola per parola; oltre i 320 caratteri il testo viene accorciato e compare il link "Leggi tutto"
   verso la recensione su Google. I nomi vengono abbreviati a nome e iniziale (es. "Marco R.").
+  Due filtri tengono fuori le recensioni sgradite anche se hanno 5 stelle: uno automatico su parole
+  negative in italiano e inglese (elenco PAROLE_ESCLUSE negli script, es. "rubbish", "pessimo") e uno
+  manuale, il file recensioni-escluse.txt: una riga per recensione, con il nome abbreviato come compare
+  nella pagina (es. "Tania G.") o un pezzo del link della recensione. Basta salvarlo: al prossimo
+  aggiornamento la recensione sparisce (per vederlo subito, lancia l'aggiornamento a mano).
   Nella giostra della pagina entrano tutte le recensioni del file con almeno 4 stelle
   (CONFIG.recensioniStelleMinime in index.html: con 3 compaiono anche quelle da 3 stelle).
   Finche' l'automatismo non e' configurato, nella pagina restano i tre segnaposto.

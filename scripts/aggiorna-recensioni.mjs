@@ -23,6 +23,11 @@ const MASSIMO_TUTTE = 12;   // numero massimo di recensioni conservate nel file
 const TESTO_MAX = 320;      // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
 const TESTO_MIN = 40;       // recensioni piu' corte non vengono scelte
 const VALUTAZIONE_MIN = 4;  // recensioni con meno stelle non vengono scelte
+// Parole che, anche in una recensione a 5 stelle, non vogliamo in evidenza: la recensione viene lasciata fuori.
+const PAROLE_ESCLUSE = ["rubbish", "terrible", "awful", "horrible", "disgusting", "worst", "rude", "dirty", "overpriced", "rip off", "rip-off", "scam", "avoid", "never again", "disappoint", "unfriendly",
+  "pessim", "orribil", "terribil", "schifo", "maleducat", "sporc", "delus", "scaden", "sconsigli", "mai più", "mai piu", "da evitare", "fregatura", "vergogn"];
+// Esclusioni manuali: righe di recensioni-escluse.txt (nome abbreviato come appare nella pagina, es. "Tania G.", o un pezzo del link).
+const FILE_ESCLUSE = new URL("../recensioni-escluse.txt", import.meta.url);
 
 // Una recensione per ciascuna categoria del documento della campagna, in quest'ordine.
 const CATEGORIE = [
@@ -174,7 +179,9 @@ function normalizza(dati, extra, precedente, adesso) {
       scaricate.push(c);
     }
   }
-  const tutte = unisci(scaricate.map(({ testoIntero, ...r }) => ({ ...r, testoIntero })), precedente, adesso);
+  const manuali = escluseManuali();
+  const tutte = unisci(scaricate.map(({ testoIntero, ...r }) => ({ ...r, testoIntero })), precedente, adesso)
+    .filter((r) => !daEscludere({ ...r, testoIntero: r.testoIntero ?? r.testo }, manuali));
   return {
     aggiornato: new Date(adesso).toISOString(),
     placeId: dati.id || placeId || "",
@@ -185,6 +192,17 @@ function normalizza(dati, extra, precedente, adesso) {
     scelte: scegli(tutte.map((r) => ({ ...r, testoIntero: r.testoIntero ?? r.testo }))),
     tutte: tutte.map(({ testoIntero, ...r }) => r),
   };
+}
+
+function escluseManuali() {
+  if (!existsSync(FILE_ESCLUSE)) return [];
+  return readFileSync(FILE_ESCLUSE, "utf8").split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#")).map((l) => l.toLowerCase());
+}
+function daEscludere(r, manuali) {
+  const t = r.testoIntero.toLowerCase();
+  if (PAROLE_ESCLUSE.some((p) => t.includes(p))) return true;
+  const autore = r.autore.toLowerCase(), link = (r.link || "").toLowerCase();
+  return manuali.some((m) => autore === m || (link && link.includes(m)));
 }
 
 function senzaData(o) { const c = { ...o }; delete c.aggiornato; return JSON.stringify(c); }

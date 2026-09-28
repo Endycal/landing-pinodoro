@@ -18,6 +18,9 @@ const MASSIMO_TUTTE = 12;              // numero massimo di recensioni conservat
 const TESTO_MAX = 320;                 // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
 const TESTO_MIN = 40;                  // recensioni piu' corte non vengono scelte
 const VALUTAZIONE_MIN = 4;             // recensioni con meno stelle non vengono scelte
+// Parole che, anche in una recensione a 5 stelle, non vogliamo in evidenza: la recensione viene lasciata fuori.
+const PAROLE_ESCLUSE = ['rubbish', 'terrible', 'awful', 'horrible', 'disgusting', 'worst', 'rude', 'dirty', 'overpriced', 'rip off', 'rip-off', 'scam', 'avoid', 'never again', 'disappoint', 'unfriendly',
+    'pessim', 'orribil', 'terribil', 'schifo', 'maleducat', 'sporc', 'delus', 'scaden', 'sconsigli', 'mai più', 'mai piu', 'da evitare', 'fregatura', 'vergogn'];
 const TIMEOUT_SEC = 20;
 const ETA_MASSIMA_SEC = 7 * 24 * 3600; // dopo una settimana recensioni.json va rinnovato
 const RIPROVA_DOPO_SEC = 6 * 3600;     // se Google non risponde, si riprova al massimo ogni 6 ore
@@ -290,7 +293,8 @@ function normalizza(array $dati, array $extra, string $placeId, ?array $preceden
             $scaricate[] = $c;
         }
     }
-    $tutte = unisci($scaricate, $precedente, $adesso);
+    $manuali = escluseManuali();
+    $tutte = array_values(array_filter(unisci($scaricate, $precedente, $adesso), static fn(array $r): bool => !daEscludere($r, $manuali)));
     $perScelta = array_map(static function (array $r): array {
         $r['testoIntero'] = $r['testoIntero'] ?? $r['testo'];
         return $r;
@@ -310,6 +314,41 @@ function normalizza(array $dati, array $extra, string $placeId, ?array $preceden
             return $r;
         }, $tutte),
     ];
+}
+
+/** Esclusioni manuali: righe di recensioni-escluse.txt (nome abbreviato come nella pagina, es. "Tania G.", o un pezzo del link). */
+function escluseManuali(): array
+{
+    $file = __DIR__ . '/recensioni-escluse.txt';
+    if (!is_file($file)) {
+        return [];
+    }
+    $righe = [];
+    foreach (preg_split('/\r?\n/', (string) file_get_contents($file)) as $riga) {
+        $riga = trim($riga);
+        if ($riga !== '' && !str_starts_with($riga, '#')) {
+            $righe[] = mb_strtolower($riga);
+        }
+    }
+    return $righe;
+}
+
+function daEscludere(array $r, array $manuali): bool
+{
+    $t = mb_strtolower($r['testoIntero'] ?? $r['testo']);
+    foreach (PAROLE_ESCLUSE as $p) {
+        if (str_contains($t, $p)) {
+            return true;
+        }
+    }
+    $autore = mb_strtolower($r['autore']);
+    $link = mb_strtolower((string) ($r['link'] ?? ''));
+    foreach ($manuali as $m) {
+        if ($autore === $m || ($link !== '' && str_contains($link, $m))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function codifica(array $dati): string

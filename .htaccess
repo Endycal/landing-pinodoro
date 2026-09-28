@@ -11,7 +11,7 @@ Options -Indexes
 </IfModule>
 
 # File di lavoro e configurazione: mai scaricabili (config.php viene comunque eseguito, non mostrato).
-<FilesMatch "^(config\.php|config\.example\.php|recensioni-lib\.php|recensioni\.lock|recensioni\.ultimo-tentativo|recensioni\.json\.tmp|README\.md|LICENSE|\.gitignore|\.nojekyll|\.ftp-deploy-sync-state\.json)$">
+<FilesMatch "^(config\.php|config\.example\.php|recensioni-lib\.php|recensioni-escluse\.txt|recensioni\.lock|recensioni\.ultimo-tentativo|recensioni\.json\.tmp|README\.md|LICENSE|\.gitignore|\.nojekyll|\.ftp-deploy-sync-state\.json)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
