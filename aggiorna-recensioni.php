@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 /**
  * Aggiorna recensioni.json dalla scheda Google del Lido, per hosting PHP (Hostinger e simili).
- * Non e' obbligatorio: recensioni.php rinnova il file da solo alla prima visita dopo una settimana.
- * Serve per forzare l'aggiornamento subito, o per un cron settimanale in hPanel:
+ * Non e' obbligatorio: recensioni.php rinnova il file da solo alla prima visita dopo un giorno.
+ * Serve per forzare l'aggiornamento subito, o per un cron giornaliero in hPanel:
  *   - dal cron (Avanzate > Cron Job):  php /home/UTENTE/domains/DOMINIO/public_html/CARTELLA/aggiorna-recensioni.php
  *   - dal browser, con il token scritto in config.php:  https://DOMINIO/CARTELLA/aggiorna-recensioni.php?token=IL_TOKEN
  * Configurazione in config.php (copia di config.example.php). Richiede PHP 8.1+ con curl, json, mbstring.

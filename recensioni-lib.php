@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Funzioni condivise per l'aggiornamento delle recensioni su hosting PHP (Hostinger e simili).
  * Le usano:
  *   - aggiorna-recensioni.php  (dal cron di hPanel o dal browser con token)
- *   - recensioni.php           (risponde al posto di recensioni.json e, se il file ha piu' di una settimana, lo rinnova prima)
+ *   - recensioni.php           (risponde al posto di recensioni.json e, se il file ha piu' di un giorno, lo rinnova prima)
  * Stessa logica di scripts/aggiorna-recensioni.mjs, la versione per GitHub Actions.
  */
 
@@ -22,8 +22,8 @@ const VALUTAZIONE_MIN = 4;             // recensioni con meno stelle non vengono
 const PAROLE_ESCLUSE = ['rubbish', 'terrible', 'awful', 'horrible', 'disgusting', 'worst', 'rude', 'dirty', 'overpriced', 'rip off', 'rip-off', 'scam', 'avoid', 'never again', 'disappoint', 'unfriendly',
     'pessim', 'orribil', 'terribil', 'schifo', 'maleducat', 'sporc', 'delus', 'scaden', 'sconsigli', 'mai più', 'mai piu', 'da evitare', 'fregatura', 'vergogn'];
 const TIMEOUT_SEC = 20;
-const ETA_MASSIMA_SEC = 7 * 24 * 3600; // dopo una settimana recensioni.json va rinnovato
-const RIPROVA_DOPO_SEC = 6 * 3600;     // se Google non risponde, si riprova al massimo ogni 6 ore
+const ETA_MASSIMA_SEC = 24 * 3600;     // dopo un giorno recensioni.json va rinnovato
+const RIPROVA_DOPO_SEC = 3600;         // se Google non risponde, si riprova al massimo ogni ora
 
 // Una recensione per ciascuna categoria del documento della campagna, in quest'ordine.
 const CATEGORIE = [

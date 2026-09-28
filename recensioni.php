@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 /**
  * Risponde al posto di recensioni.json (la regola e' in .htaccess: la pagina continua a chiedere recensioni.json).
- * Se config.php contiene la chiave e il file ha piu' di una settimana, prima lo rinnova da Google, poi lo serve.
+ * Se config.php contiene la chiave e il file ha piu' di un giorno, prima lo rinnova da Google, poi lo serve.
  * Cosi' su Hostinger le recensioni si aggiornano da sole, senza cron. Se Google non risponde, serve il file
- * che c'e' e riprova al massimo ogni 6 ore. Senza chiave, serve semplicemente il file.
+ * che c'e' e riprova al massimo ogni ora. Senza chiave, serve semplicemente il file.
  * L'intestazione X-Recensioni dice cosa e' successo: non-necessario, aggiornato, invariato, rinviato, in-corso, fallito.
  */
 
