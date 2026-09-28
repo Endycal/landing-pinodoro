@@ -8,6 +8,7 @@ Si carica cosi' com'e' su qualsiasi spazio web.
 COSA C'E' IN QUESTO REPOSITORY
   index.html      la pagina (testi, stile e script sono tutti dentro questo file)
   logo.png        il logo
+  logo-scuro.png  il logo con la scritta chiara, per il tema scuro (generato dal logo)
   foto/           qui vanno le due foto (vedi sotto)
   README.md       questo file
   recensioni.json valutazione, numero di recensioni e recensioni della scheda Google (aggiornato in automatico)
@@ -162,6 +163,14 @@ SU HOSTINGER (recensioni automatiche senza GitHub)
     Secrets:   HOSTINGER_FTP_USER, HOSTINGER_FTP_PASSWORD (hPanel > File > Account FTP)
   Con questo attivo il cron su Hostinger non serve piu': le recensioni arrivano gia' aggiornate da GitHub.
   Senza queste impostazioni il caricamento FTP non parte e non da' errori.
+
+TEMA SCURO
+  La pagina segue il tema del telefono o del computer (chiaro o scuro). Il pulsante rotondo in alto a
+  destra, accanto al logo (luna o sole), permette di scegliere l'altro tema: la scelta resta nel browser
+  del visitatore (localStorage, nessun cookie, memorizzazione tecnica che non richiede consenso) e vale
+  per le visite successive. Il tema scuro usa lo stesso oro su fondo notte e il logo con la scritta
+  chiara (logo-scuro.png). I colori sono nelle variabili in cima al CSS di index.html: il blocco :root
+  e' il tema chiaro, i due blocchi subito sotto (identici) sono il tema scuro.
 
 GOOGLE ADS
   Crea cinque conversioni (Portami li', Chiama, WhatsApp Lavoro, WhatsApp Sosta, WhatsApp generico),
