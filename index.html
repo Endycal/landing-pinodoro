@@ -98,8 +98,8 @@
       --alone-1: rgba(230, 207, 122, .42);
       --alone-2: rgba(201, 162, 39, .16);
       --evidenza: rgba(230, 207, 122, .3);
-      --logo-chiaro: block;
-      --logo-scuro: none;
+      --logo-chiaro: 1;
+      --logo-scuro: 0;
       --raggio: 18px;
       --max: 1080px;
       --barra: 4.7rem;
@@ -124,8 +124,8 @@
       --alone-1: rgba(230, 207, 122, .14);
       --alone-2: rgba(201, 162, 39, .08);
       --evidenza: rgba(230, 207, 122, .16);
-      --logo-chiaro: none;
-      --logo-scuro: block;
+      --logo-chiaro: 0;
+      --logo-scuro: 1;
       }
     }
     :root[data-tema="scuro"] {
@@ -145,8 +145,8 @@
       --alone-1: rgba(230, 207, 122, .14);
       --alone-2: rgba(201, 162, 39, .08);
       --evidenza: rgba(230, 207, 122, .16);
-      --logo-chiaro: none;
-      --logo-scuro: block;
+      --logo-chiaro: 0;
+      --logo-scuro: 1;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -219,8 +219,10 @@
       border-bottom: 1px solid var(--linea); background: var(--superficie-velata);
     }
     .testata img { height: 60px; width: auto; }
-    .logo-chiaro { display: var(--logo-chiaro); }
-    .logo-scuro { display: var(--logo-scuro); }
+    .logo { display: grid; }
+    .logo img { grid-area: 1 / 1; }
+    .logo-chiaro { opacity: var(--logo-chiaro); }
+    .logo-scuro { opacity: var(--logo-scuro); }
     /* Pulsante tema chiaro/scuro, a destra del logo */
     .tema {
       position: absolute; right: max(1rem, calc((100% - var(--max)) / 2)); top: 50%; transform: translateY(-50%);
@@ -229,6 +231,15 @@
     }
     .tema svg { width: 1.1rem; height: 1.1rem; }
     .tema:focus-visible { outline: 2px solid var(--oro-testo); outline-offset: 2px; }
+    /* Passaggio tra i temi: un cerchio che si apre dal pulsante (View Transitions, browser recenti) oppure, dove
+       l'API non c'e', una dissolvenza dei colori di mezzo secondo. Con "riduci animazioni" il cambio e' immediato. */
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    .tema-transizione, .tema-transizione *, .tema-transizione *::before, .tema-transizione *::after {
+      transition: background-color .45s ease, color .45s ease, border-color .45s ease, box-shadow .45s ease, opacity .45s ease !important;
+    }
+    .tema svg.gira { animation: tema-gira .5s ease; }
+    @keyframes tema-gira { from { transform: rotate(-120deg) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .tema svg.gira { animation: none; } }
 
     /* Foto (con cornice dorata come riserva finche' manca il file) */
     .foto {
@@ -420,8 +431,10 @@
   <div class="striscia-data"><span id="data-striscia">Oggi</span> · <span data-orario>12:00-15:30</span></div>
 
   <header class="testata">
-    <img class="logo-chiaro" src="logo.png" alt="Lido Pino d'Oro, ristorante sulla spiaggia" width="92" height="60">
-    <img class="logo-scuro" src="logo-scuro.png" alt="Lido Pino d'Oro, ristorante sulla spiaggia" width="92" height="60">
+    <div class="logo">
+      <img class="logo-chiaro" src="logo.png" alt="Lido Pino d'Oro, ristorante sulla spiaggia" width="92" height="60">
+      <img class="logo-scuro" src="logo-scuro.png" alt="" width="92" height="60">
+    </div>
     <button type="button" class="tema" id="tema" aria-label="Passa al tema scuro" aria-pressed="false"><svg aria-hidden="true"><use href="#i-luna"/></svg></button>
   </header>
 
@@ -806,12 +819,34 @@
         tema.bottone.querySelector("use").setAttribute("href", scuro ? "#i-sole" : "#i-luna");
         Array.prototype.forEach.call(document.querySelectorAll("meta[name='theme-color']"), function (m) { m.setAttribute("content", scuro ? "#141210" : "#ffffff"); });
       }
-      tema.bottone.addEventListener("click", function () {
-        var scelta = temaScuro() ? "chiaro" : "scuro";
-        document.documentElement.setAttribute("data-tema", scelta);
-        try { localStorage.setItem("tema", scelta); } catch (e) {}
-        temaAggiorna();
-      });
+      function temaCambia() {
+        var scelta = temaScuro() ? "chiaro" : "scuro", icona = tema.bottone.querySelector("svg"), radice = document.documentElement;
+        function applica() {
+          radice.setAttribute("data-tema", scelta);
+          try { localStorage.setItem("tema", scelta); } catch (e) {}
+          temaAggiorna();
+          if (pocheAnimazioni()) return;
+          icona.classList.remove("gira"); void icona.offsetWidth; icona.classList.add("gira");
+          icona.addEventListener("animationend", function () { icona.classList.remove("gira"); }, { once: true });
+        }
+        if (pocheAnimazioni()) { applica(); return; }
+        if (document.startViewTransition) {
+          // Cerchio che parte dal centro del pulsante e copre tutta la finestra
+          var r = tema.bottone.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+          var raggio = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+          document.startViewTransition(applica).ready.then(function () {
+            radice.animate(
+              { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + raggio + "px at " + x + "px " + y + "px)"] },
+              { duration: 650, easing: "ease-in-out", pseudoElement: "::view-transition-new(root)" }
+            );
+          }).catch(function () {});
+          return;
+        }
+        radice.classList.add("tema-transizione");
+        applica();
+        setTimeout(function () { radice.classList.remove("tema-transizione"); }, 500);
+      }
+      tema.bottone.addEventListener("click", temaCambia);
       if (tema.sistema && tema.sistema.addEventListener) tema.sistema.addEventListener("change", temaAggiorna);
       temaAggiorna();
 

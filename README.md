@@ -169,7 +169,9 @@ TEMA SCURO
   destra, accanto al logo (luna o sole), permette di scegliere l'altro tema: la scelta resta nel browser
   del visitatore (localStorage, nessun cookie, memorizzazione tecnica che non richiede consenso) e vale
   per le visite successive. Il tema scuro usa lo stesso oro su fondo notte e il logo con la scritta
-  chiara (logo-scuro.png). I colori sono nelle variabili in cima al CSS di index.html: il blocco :root
+  chiara (logo-scuro.png). Il passaggio da un tema all'altro e' animato: un cerchio che si apre dal
+  pulsante (browser recenti) o una dissolvenza dei colori; con "riduci animazioni" il cambio e' immediato.
+  I colori sono nelle variabili in cima al CSS di index.html: il blocco :root
   e' il tema chiaro, i due blocchi subito sotto (identici) sono il tema scuro.
 
 GOOGLE ADS
