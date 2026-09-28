@@ -12,7 +12,9 @@ COSA C'E' IN QUESTO REPOSITORY
   README.md       questo file
   recensioni.json valutazione, numero di recensioni e recensioni della scheda Google (aggiornato in automatico)
   scripts/        lo script che scarica le recensioni da Google (versione per GitHub Actions)
-  aggiorna-recensioni.php   lo stesso aggiornamento in PHP, per Hostinger (vedi "SU HOSTINGER")
+  recensioni.php            su Hostinger risponde al posto di recensioni.json e lo rinnova da Google ogni settimana
+  aggiorna-recensioni.php   aggiornamento forzato (cron di hPanel o browser con token), per Hostinger
+  recensioni-lib.php        funzioni comuni ai due file PHP
   config.example.php        modello del file con la chiave, solo per Hostinger
   .htaccess       regole di protezione per Hostinger (GitHub Pages le ignora)
   .github/        gli automatismi: pubblicazione su GitHub Pages, aggiornamento delle recensioni, caricamento FTP facoltativo
@@ -87,8 +89,15 @@ RECENSIONI GOOGLE AUTOMATICHE
   se CONFIG.googlePlaceId in index.html e' vuoto.
 
 SU HOSTINGER (recensioni automatiche senza GitHub)
-  Su un hosting PHP l'aggiornamento settimanale lo fa aggiorna-recensioni.php, con la stessa logica
-  dello script per GitHub, lanciato dal cron di hPanel. La pagina non cambia: legge recensioni.json.
+  La copia su Hostinger e' indipendente da GitHub: quello che GitHub aggiorna ogni lunedi' NON arriva
+  da solo su Hostinger (a meno del caricamento FTP facoltativo descritto in fondo). Su Hostinger
+  l'aggiornamento avviene cosi': la regola in .htaccess fa rispondere recensioni.php al posto di
+  recensioni.json; se config.php contiene la chiave e il file ha piu' di una settimana, recensioni.php
+  lo rinnova da Google prima di servirlo. Quindi basta caricare i file e compilare config.php: la prima
+  visita dopo una settimana rinnova le recensioni da sola, senza cron. Se Google non risponde, resta il
+  file precedente e si riprova al massimo ogni 6 ore. Il cron di hPanel (passo 3) e' facoltativo: serve
+  solo se vuoi che il rinnovo avvenga a un'ora precisa invece che alla prima visita.
+  La pagina non cambia: chiede sempre recensioni.json.
   1. Carica i file su Hostinger. Per averla come sottopagina del sito esistente (es. tuodominio.it/domiziana/):
        - hPanel > File Manager > public_html (la cartella del sito esistente);
        - crea una cartella con il nome che vuoi nell'indirizzo, tutto minuscolo e senza spazi (es. domiziana);
@@ -112,7 +121,7 @@ SU HOSTINGER (recensioni automatiche senza GitHub)
        'token'   => una frase lunga e segreta a tua scelta.
      config.php viene eseguito da PHP e non e' mai mostrato ai visitatori; .htaccess lo blocca anche
      da download diretto.
-  3. hPanel > Avanzate > Cron Job: crea un cron settimanale, il lunedi' alle 7, con il comando
+  3. (Facoltativo) hPanel > Avanzate > Cron Job: crea un cron settimanale, il lunedi' alle 7, con il comando
        php /home/UTENTE/domains/TUODOMINIO/public_html/CARTELLA/aggiorna-recensioni.php
      Il percorso esatto della cartella lo vedi in alto nel File Manager (inizia con /home/u...).
      Con la pianificazione "Personalizzata": minuto 0, ora 7, giorno *, mese *, giorno della settimana 1.
@@ -120,6 +129,16 @@ SU HOSTINGER (recensioni automatiche senza GitHub)
      Risponde con una riga ("Aggiornato recensioni.json: ..." oppure "Nessuna novita': ...").
      Senza token, o con token sbagliato, risponde "Accesso negato".
   5. Ricarica la pagina: nel blocco "La prova" compaiono voto, numero di recensioni e le tre recensioni.
+
+  Se le recensioni non si aggiornano:
+  - apri https://TUODOMINIO/CARTELLA/recensioni.json: la riga "aggiornato" dice quando e' stato rinnovato
+    il file l'ultima volta; se e' piu' vecchia di una settimana, l'aggiornamento automatico non e' partito;
+  - nella stessa risposta, tra le intestazioni (strumenti per sviluppatori del browser, scheda Rete),
+    X-Recensioni dice cosa e' successo: non-necessario (file recente), aggiornato, invariato, rinviato
+    (Google ha fallito da poco, si riprova entro 6 ore), fallito (dettagli nel log errori PHP di hPanel);
+  - controlla che config.php esista nella cartella con la chiave giusta, e che .htaccess sia stato
+    caricato (file nascosto): senza .htaccess recensioni.json viene servito come file statico e non si rinnova;
+  - per forzare subito: https://TUODOMINIO/CARTELLA/aggiorna-recensioni.php?token=IL_TOKEN.
 
   Facoltativo - caricamento automatico da GitHub a Hostinger (per chi modifica la pagina su GitHub):
   a ogni push, e dopo ogni aggiornamento delle recensioni, i workflow caricano la cartella via FTP.
