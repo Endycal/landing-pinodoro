@@ -234,8 +234,10 @@
     /* Passaggio tra i temi: un cerchio che si apre dal pulsante (View Transitions, browser recenti) oppure, dove
        l'API non c'e', una dissolvenza dei colori di mezzo secondo. Con "riduci animazioni" il cambio e' immediato. */
     ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-new(root) { will-change: clip-path; }
+    .tema-in-corso .barra { -webkit-backdrop-filter: none; backdrop-filter: none; }
     .tema-transizione, .tema-transizione *, .tema-transizione *::before, .tema-transizione *::after {
-      transition: background-color .45s ease, color .45s ease, border-color .45s ease, box-shadow .45s ease, opacity .45s ease !important;
+      transition: background-color .35s ease-out, color .35s ease-out, border-color .35s ease-out, opacity .35s ease-out !important;
     }
     .tema svg.gira { animation: tema-gira .5s ease; }
     @keyframes tema-gira { from { transform: rotate(-120deg) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -831,20 +833,25 @@
         }
         if (pocheAnimazioni()) { applica(); return; }
         if (document.startViewTransition) {
-          // Cerchio che parte dal centro del pulsante e copre tutta la finestra
+          // Cerchio che parte dal pulsante e copre tutta la finestra. Parte gia' grande quanto il pulsante e con una
+          // curva veloce all'inizio: cosi' si vede muovere dal primo fotogramma, mentre il browser prima di animare
+          // deve "fotografare" la pagina (una pausa di qualche centesimo di secondo che altrimenti sembra uno scatto).
           var r = tema.bottone.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
           var raggio = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-          document.startViewTransition(applica).ready.then(function () {
+          radice.classList.add("tema-in-corso");
+          var transizione = document.startViewTransition(applica);
+          transizione.ready.then(function () {
             radice.animate(
-              { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + raggio + "px at " + x + "px " + y + "px)"] },
-              { duration: 650, easing: "ease-in-out", pseudoElement: "::view-transition-new(root)" }
+              { clipPath: ["circle(" + (r.width / 2) + "px at " + x + "px " + y + "px)", "circle(" + raggio + "px at " + x + "px " + y + "px)"] },
+              { duration: 600, easing: "cubic-bezier(.2, .6, .3, 1)", pseudoElement: "::view-transition-new(root)" }
             );
           }).catch(function () {});
+          transizione.finished.then(function () { radice.classList.remove("tema-in-corso"); }, function () { radice.classList.remove("tema-in-corso"); });
           return;
         }
         radice.classList.add("tema-transizione");
         applica();
-        setTimeout(function () { radice.classList.remove("tema-transizione"); }, 500);
+        setTimeout(function () { radice.classList.remove("tema-transizione"); }, 400);
       }
       tema.bottone.addEventListener("click", temaCambia);
       if (tema.sistema && tema.sistema.addEventListener) tema.sistema.addEventListener("change", temaAggiorna);
