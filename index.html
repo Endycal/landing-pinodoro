@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Pranzo sulla Domiziana | Lido Pino d'Oro</title>
   <meta name="description" content="Pranzo sulla spiaggia a 1 minuto dalla Domiziana. Pesce del nostro Tirreno, prezzi chiari, servizio in 30 minuti se hai fretta. Aperti a pranzo tutti i giorni dell'anno.">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -158,6 +158,7 @@
       background: var(--fondo) linear-gradient(180deg, var(--fondo) 0%, var(--crema) 45%, var(--sabbia) 100%);
       line-height: 1.55;
       padding-bottom: calc(var(--barra) + env(safe-area-inset-bottom));
+      padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
       -webkit-font-smoothing: antialiased;
     }
     h1, h2, h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; line-height: 1.1; color: var(--inchiostro); }
@@ -210,7 +211,7 @@
       background: linear-gradient(90deg, var(--oro-scuro), var(--oro) 50%, var(--oro-scuro));
       color: var(--bianco); text-align: center;
       font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
-      line-height: 1.5; padding: .4rem 1rem; white-space: nowrap;
+      line-height: 1.5; padding: calc(.4rem + env(safe-area-inset-top)) 1rem .4rem; white-space: nowrap;
     }
 
     /* Testata */
@@ -234,8 +235,12 @@
     /* Passaggio tra i temi: un cerchio che si apre dal pulsante (View Transitions, browser recenti) oppure, dove
        l'API non c'e', una dissolvenza dei colori di mezzo secondo. Con "riduci animazioni" il cambio e' immediato. */
     ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-    ::view-transition-new(root) { will-change: clip-path; }
-    .tema-in-corso .barra { -webkit-backdrop-filter: none; backdrop-filter: none; }
+    ::view-transition-new(root) { will-change: clip-path; animation: tema-cerchio .6s cubic-bezier(.2, .6, .3, 1); }
+    @keyframes tema-cerchio {
+      from { clip-path: circle(var(--cerchio-da) at var(--cerchio-x) var(--cerchio-y)); }
+      to { clip-path: circle(var(--cerchio-a) at var(--cerchio-x) var(--cerchio-y)); }
+    }
+    .tema-in-corso .barra-vetro { -webkit-backdrop-filter: none; backdrop-filter: none; }
     .tema-transizione, .tema-transizione *, .tema-transizione *::before, .tema-transizione *::after {
       transition: background-color .35s ease-out, color .35s ease-out, border-color .35s ease-out, opacity .35s ease-out !important;
     }
@@ -373,10 +378,16 @@
     /* Pulsanti fissi in basso */
     .barra {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      padding: .6rem env(safe-area-inset-right) calc(.6rem + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+    }
+    /* Sfondo, sfocatura e bordo stanno su un figlio, non sull'elemento fisso: Safari 26 (Liquid Glass) ignora theme-color
+       e tinge la sua barra leggendo lo sfondo degli elementi fissi ai bordi; con uno sfondo semitrasparente sbaglia
+       (barra trasparente o bianca). Con l'elemento fisso senza sfondo usa il colore di sfondo della pagina, coerente col tema. */
+    .barra-vetro {
+      position: absolute; inset: 0; z-index: -1;
       background: var(--superficie-velata);
       -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
       border-top: 1px solid var(--linea);
-      padding: .6rem 0 calc(.6rem + env(safe-area-inset-bottom));
     }
     .barra-interno { width: min(var(--max), 100% - 1.5rem); margin-inline: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
     .barra .btn { padding: .7rem .4rem; font-size: .7rem; letter-spacing: .06em; min-height: 2.9rem; white-space: nowrap; }
@@ -610,6 +621,7 @@
 
   <!-- Pulsanti fissi in basso durante lo scorrimento -->
   <nav class="barra" aria-label="Azioni rapide">
+    <div class="barra-vetro" aria-hidden="true"></div>
     <div class="barra-interno">
       <a class="btn btn-oro" data-azione="portami-li" href="https://www.google.com/maps/search/?api=1&amp;query=Lido%20Pino%20d%27Oro" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Portami lì</a>
       <a class="btn btn-contorno" data-azione="chiama" href="tel:+393887877008"><svg aria-hidden="true"><use href="#i-telefono"/></svg>Chiama</a>
@@ -838,15 +850,11 @@
           // deve "fotografare" la pagina (una pausa di qualche centesimo di secondo che altrimenti sembra uno scatto).
           var r = tema.bottone.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
           var raggio = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+          radice.style.setProperty("--cerchio-x", x + "px"); radice.style.setProperty("--cerchio-y", y + "px");
+          radice.style.setProperty("--cerchio-da", (r.width / 2) + "px"); radice.style.setProperty("--cerchio-a", raggio + "px");
           radice.classList.add("tema-in-corso");
-          var transizione = document.startViewTransition(applica);
-          transizione.ready.then(function () {
-            radice.animate(
-              { clipPath: ["circle(" + (r.width / 2) + "px at " + x + "px " + y + "px)", "circle(" + raggio + "px at " + x + "px " + y + "px)"] },
-              { duration: 600, easing: "cubic-bezier(.2, .6, .3, 1)", pseudoElement: "::view-transition-new(root)" }
-            );
-          }).catch(function () {});
-          transizione.finished.then(function () { radice.classList.remove("tema-in-corso"); }, function () { radice.classList.remove("tema-in-corso"); });
+          var fine = function () { radice.classList.remove("tema-in-corso"); };
+          document.startViewTransition(applica).finished.then(fine, fine); // l'animazione e' nel CSS (keyframes tema-cerchio)
           return;
         }
         radice.classList.add("tema-transizione");

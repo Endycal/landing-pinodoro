@@ -174,6 +174,14 @@ TEMA SCURO
   I colori sono nelle variabili in cima al CSS di index.html: il blocco :root
   e' il tema chiaro, i due blocchi subito sotto (identici) sono il tema scuro.
 
+SAFARI 26 (LIQUID GLASS)
+  Su iPhone, iPad e Mac con Safari 26 la barra di Safari e' di vetro e si tinge da sola: ignora theme-color
+  e legge lo sfondo degli elementi fissi ai bordi della pagina, altrimenti lo sfondo della pagina. Per questo
+  la barra fissa dei pulsanti in basso non ha sfondo: sfondo, sfocatura e bordo stanno sul figlio .barra-vetro.
+  Non spostarli sull'elemento fisso. La pagina arriva ai bordi dello schermo (viewport-fit=cover) e tiene
+  conto dei margini di sicurezza con env(safe-area-inset-*): striscia della data sotto la barra di stato,
+  barra dei pulsanti sopra l'indicatore Home, margini laterali con la tacca in orizzontale.
+
 GOOGLE ADS
   Crea cinque conversioni (Portami li', Chiama, WhatsApp Lavoro, WhatsApp Sosta, WhatsApp generico),
   copia l'ID del tag (AW-...) e le cinque etichette nel blocco CONFIG. Il tag si carica solo se
