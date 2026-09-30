@@ -57,7 +57,10 @@
     [ ] Foto dello Spaghetto ai Lupini (blocco 3) -> cartella foto/; facoltativa: il tavolo sulla spiaggia d'inverno (in alto)
     [x] Tema scuro: segue il sistema, pulsante sole/luna nella testata; colori nelle variabili in cima al CSS
     [x] Place ID della scheda Google            -> CONFIG.googlePlaceId (scheda "Ristorante Pino D'Oro", Mondragone)
-    [ ] ID Google Ads ed etichette di conversione -> CONFIG.googleAdsId e CONFIG.conversioni
+    [ ] ID Google Ads ed etichette di conversione -> CONFIG.googleAdsId e CONFIG.conversioni (con l'ID impostato compare
+        il banner cookie: il tag di Google parte solo dopo "Accetta")
+    [ ] Dati del titolare nelle note legali (ragione sociale, indirizzo, P.IVA, REA, PEC, hosting, condizioni della garanzia)
+        -> pie' di pagina qui sotto, termini.html, privacy.html; i punti sono evidenziati come "da completare"
 
     MISURAZIONE (foglio 4-MARKETING)
     - Nuove parole chiave WhatsApp: DOMIZIANA LAVORO, DOMIZIANA SOSTA, DOMIZIANA (accanto a PRANZO e DOMENICA).
@@ -71,10 +74,14 @@
       if (g === "lavoro" || g === "sosta") document.documentElement.setAttribute("data-g", g);
     })();
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Caratteri ospitati qui (cartella caratteri/, licenza SIL OFL in caratteri/OFL.txt): nessuna richiesta a Google Fonts -->
+  <link rel="preload" href="caratteri/montserrat.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="caratteri/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    @font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400 600; font-display: swap; src: url(caratteri/montserrat.woff2) format('woff2'); }
+    @font-face { font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 500 600; font-display: swap; src: url(caratteri/cormorant-garamond.woff2) format('woff2'); }
+    @font-face { font-family: 'Cormorant Garamond'; font-style: italic; font-weight: 400; font-display: swap; src: url(caratteri/cormorant-garamond-corsivo.woff2) format('woff2'); }
+
     /* Tema chiaro (predefinito): oro su bianco. --bianco resta bianco in entrambi i temi (testo sui pulsanti d'oro,
        didascalie sulle foto); le superfici e i testi usano le variabili che il tema scuro ridefinisce. */
     :root {
@@ -375,6 +382,25 @@
     .indirizzo { font-size: .85rem; color: var(--inchiostro-tenue); }
     .firma { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; margin-top: .35rem; }
 
+    /* Pie' di pagina: dati del titolare e note legali */
+    .pie { text-align: center; font-size: .72rem; color: var(--inchiostro-tenue); padding: 0 0 1.6rem; line-height: 1.7; }
+    .pie a { color: var(--oro-testo); font-weight: 600; border-bottom: 1px solid var(--linea); }
+    .pie a[hidden] { display: none; }
+
+    /* Banner cookie: compare solo se la misurazione Google Ads e' configurata e non c'e' ancora una scelta */
+    .consenso { position: fixed; left: 0; right: 0; bottom: calc(var(--barra) + env(safe-area-inset-bottom) + .6rem); z-index: 45; padding: 0 .75rem; }
+    .consenso[hidden] { display: none; }
+    .consenso-scatola {
+      width: min(var(--max), 100%); margin-inline: auto; background: var(--superficie); border: 1px solid var(--oro);
+      border-radius: var(--raggio); box-shadow: var(--ombra); padding: 1rem 1.1rem;
+      display: grid; gap: .8rem;
+    }
+    .consenso-scatola p { font-size: .84rem; line-height: 1.5; }
+    .consenso-scatola a { color: var(--oro-testo); font-weight: 600; border-bottom: 1px solid var(--linea); white-space: nowrap; }
+    .consenso-azioni { display: flex; gap: .6rem; justify-content: flex-end; flex-wrap: wrap; }
+    .consenso-azioni .btn { min-height: 2.6rem; padding: .55rem 1.1rem; }
+    @media (min-width: 820px) { .consenso-scatola { grid-template-columns: 1fr auto; align-items: center; } }
+
     /* Pulsanti fissi in basso */
     .barra {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -619,6 +645,25 @@
     </section>
   </main>
 
+  <footer class="pie">
+    <div class="contenitore">
+      <p>© <span id="anno">2026</span> Lido Pino d'Oro · <span class="dc">[ragione sociale]</span> · P.IVA <span class="dc">[00000000000]</span> · Mondragone (CE)</p>
+      <nav aria-label="Note legali"><a href="termini.html">Termini e condizioni</a> · <a href="privacy.html">Privacy</a> · <a href="cookie.html">Cookie</a> <a href="#" id="preferenze-cookie" hidden>· Preferenze cookie</a></nav>
+    </div>
+  </footer>
+
+  <!-- Banner cookie (Linee guida del Garante 10 giugno 2021): "Accetta" e "Rifiuta" di pari evidenza, nessun cookie prima
+       della scelta, scelta ricordata 6 mesi, riapribile da "Preferenze cookie". Compare solo con CONFIG.googleAdsId impostato. -->
+  <div class="consenso" id="consenso" role="region" aria-label="Uso dei cookie" hidden>
+    <div class="consenso-scatola">
+      <p><strong>Cookie per misurare gli annunci.</strong> Se accetti, Google Ads registra le azioni sui pulsanti (indicazioni, chiamata, WhatsApp) per capire quali annunci funzionano. Senza il tuo consenso non installiamo alcun cookie. Puoi cambiare idea da "Preferenze cookie" in fondo alla pagina. <a href="cookie.html">Cookie policy</a> · <a href="privacy.html">Privacy</a></p>
+      <div class="consenso-azioni">
+        <button type="button" class="btn btn-contorno" data-consenso="rifiutati">Rifiuta</button>
+        <button type="button" class="btn btn-oro" data-consenso="accettati">Accetta</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Pulsanti fissi in basso durante lo scorrimento -->
   <nav class="barra" aria-label="Azioni rapide">
     <div class="barra-vetro" aria-hidden="true"></div>
@@ -728,11 +773,24 @@
       };
 
       // Google Ads: ogni pulsante e' una conversione separata (Portami li', Chiama, WhatsApp Lavoro,
-      // WhatsApp Sosta, WhatsApp generico) e porta con se' il gruppo di annunci (?g=). Il tag viene
-      // caricato in modo asincrono, solo se configurato, per restare sotto i 2 secondi.
+      // WhatsApp Sosta, WhatsApp generico) e porta con se' il gruppo di annunci (?g=). Il tag di Google e' l'unica
+      // cosa della pagina che usa cookie: viene caricato solo se configurato E solo dopo l'"Accetta" nel banner
+      // (scelta ricordata 6 mesi in localStorage "cookie-consenso"). Senza consenso non parte nulla verso Google.
       window.dataLayer = window.dataLayer || [];
-      if (CONFIG.googleAdsId) {
+      var consenso = { chiave: "cookie-consenso", giorni: 180, banner: document.getElementById("consenso"), link: document.getElementById("preferenze-cookie"), adsCaricato: false };
+      function consensoLeggi() {
+        try {
+          var v = JSON.parse(localStorage.getItem(consenso.chiave) || "null");
+          if (v && (v.scelta === "accettati" || v.scelta === "rifiutati") && Date.now() - v.quando < consenso.giorni * 864e5) return v.scelta;
+        } catch (e) {}
+        return "";
+      }
+      function consensoSalva(scelta) { try { localStorage.setItem(consenso.chiave, JSON.stringify({ scelta: scelta, quando: Date.now() })); } catch (e) {} }
+      function caricaAds() {
+        if (consenso.adsCaricato || !CONFIG.googleAdsId) return;
+        consenso.adsCaricato = true;
         window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+        window.gtag("consent", "default", { ad_storage: "granted", ad_user_data: "granted", ad_personalization: "denied", analytics_storage: "denied" });
         window.gtag("js", new Date());
         window.gtag("config", CONFIG.googleAdsId);
         var tag = document.createElement("script");
@@ -740,6 +798,23 @@
         tag.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CONFIG.googleAdsId);
         document.head.appendChild(tag);
       }
+      if (CONFIG.googleAdsId) {
+        consenso.link.hidden = false;
+        consenso.link.addEventListener("click", function (e) { e.preventDefault(); consenso.banner.hidden = false; });
+        Array.prototype.forEach.call(consenso.banner.querySelectorAll("[data-consenso]"), function (b) {
+          b.addEventListener("click", function () {
+            var scelta = b.getAttribute("data-consenso");
+            consensoSalva(scelta);
+            consenso.banner.hidden = true;
+            if (scelta === "accettati") caricaAds();
+            else if (consenso.adsCaricato) window.gtag("consent", "update", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
+          });
+        });
+        var sceltaSalvata = consensoLeggi();
+        if (sceltaSalvata === "accettati") caricaAds();
+        else if (!sceltaSalvata) consenso.banner.hidden = false;
+      }
+      document.getElementById("anno").textContent = String(new Date().getFullYear());
       function traccia(azione) {
         window.dataLayer.push({ event: "clic_pulsante", azione: azione, gruppo: gruppo });
         var etichetta = CONFIG.conversioni[azione];

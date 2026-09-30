@@ -1,0 +1,116 @@
+/* Stile delle pagine legali (termini.html, privacy.html, cookie.html): stessi colori, caratteri e temi della landing.
+   Le variabili sono le stesse di index.html: se cambi un colore la', cambialo anche qui. */
+
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400 600; font-display: swap; src: url(caratteri/montserrat.woff2) format('woff2'); }
+@font-face { font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 500 600; font-display: swap; src: url(caratteri/cormorant-garamond.woff2) format('woff2'); }
+@font-face { font-family: 'Cormorant Garamond'; font-style: italic; font-weight: 400; font-display: swap; src: url(caratteri/cormorant-garamond-corsivo.woff2) format('woff2'); }
+
+:root {
+  color-scheme: light;
+  --bianco: #ffffff;
+  --fondo: #ffffff;
+  --crema: #fdfaf3;
+  --sabbia: #f6efdc;
+  --superficie: #ffffff;
+  --superficie-velata: rgba(255, 255, 255, .9);
+  --oro: #c9a227;
+  --oro-chiaro: #e6cf7a;
+  --oro-scuro: #a5821a;
+  --oro-testo: #a5821a;
+  --inchiostro: #1f1b14;
+  --inchiostro-tenue: #5c554a;
+  --linea: rgba(201, 162, 39, 0.32);
+  --evidenza: rgba(230, 207, 122, .3);
+  --logo-chiaro: 1;
+  --logo-scuro: 0;
+  --max: 760px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="chiaro"]) {
+    color-scheme: dark;
+    --fondo: #141210;
+    --crema: #191612;
+    --sabbia: #201a10;
+    --superficie: #1f1b16;
+    --superficie-velata: rgba(24, 21, 17, .9);
+    --oro-testo: #dcb84a;
+    --inchiostro: #f3ecdc;
+    --inchiostro-tenue: #b9af9d;
+    --linea: rgba(201, 162, 39, 0.4);
+    --evidenza: rgba(230, 207, 122, .16);
+    --logo-chiaro: 0;
+    --logo-scuro: 1;
+  }
+}
+:root[data-tema="scuro"] {
+  color-scheme: dark;
+  --fondo: #141210;
+  --crema: #191612;
+  --sabbia: #201a10;
+  --superficie: #1f1b16;
+  --superficie-velata: rgba(24, 21, 17, .9);
+  --oro-testo: #dcb84a;
+  --inchiostro: #f3ecdc;
+  --inchiostro-tenue: #b9af9d;
+  --linea: rgba(201, 162, 39, 0.4);
+  --evidenza: rgba(230, 207, 122, .16);
+  --logo-chiaro: 0;
+  --logo-scuro: 1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  font-family: 'Montserrat', system-ui, sans-serif; font-weight: 400; line-height: 1.6; color: var(--inchiostro);
+  background: var(--fondo) linear-gradient(180deg, var(--fondo) 0%, var(--crema) 45%, var(--sabbia) 100%);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; line-height: 1.15; color: var(--inchiostro); }
+a { color: var(--oro-testo); text-decoration: none; border-bottom: 1px solid var(--linea); }
+a:hover { border-bottom-color: var(--oro-testo); }
+strong { font-weight: 600; }
+img { max-width: 100%; display: block; }
+
+.testata {
+  height: 84px; display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--linea); background: var(--superficie-velata);
+  padding-top: env(safe-area-inset-top);
+}
+.testata a { border: 0; }
+.logo { display: grid; }
+.logo img { grid-area: 1 / 1; height: 60px; width: auto; }
+.logo-chiaro { opacity: var(--logo-chiaro); }
+.logo-scuro { opacity: var(--logo-scuro); }
+
+.contenitore { width: min(var(--max), 100% - 2rem); margin-inline: auto; }
+.legale { padding: 2rem 0 3rem; }
+.occhiello {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-size: .7rem; letter-spacing: .26em; text-transform: uppercase; color: var(--oro-testo); font-weight: 600;
+}
+.occhiello::before { content: ""; width: 28px; height: 1px; background: var(--oro); }
+.legale h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); margin: .5rem 0 .3rem; }
+.aggiornato { font-size: .78rem; color: var(--inchiostro-tenue); margin-bottom: 1.6rem; }
+.legale h2 { font-size: 1.45rem; margin: 1.8rem 0 .5rem; }
+.legale h3 { font-size: 1.15rem; margin: 1.1rem 0 .3rem; }
+.legale p, .legale li { font-size: .95rem; }
+.legale p + p { margin-top: .6rem; }
+.legale ul, .legale ol { margin: .5rem 0 .5rem 1.2rem; }
+.legale li + li { margin-top: .3rem; }
+.riquadro { background: var(--superficie); border: 1px solid var(--linea); border-radius: 14px; padding: 1rem 1.2rem; margin: .8rem 0; }
+.dc { background: var(--evidenza); border-bottom: 1px dashed var(--oro-testo); padding: 0 .15em; border-radius: 2px; }
+
+.tabella { width: 100%; border-collapse: collapse; margin: .8rem 0; font-size: .86rem; }
+.tabella th, .tabella td { text-align: left; vertical-align: top; padding: .55rem .6rem; border-bottom: 1px solid var(--linea); }
+.tabella th { font-weight: 600; color: var(--oro-testo); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+.tabella code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85em; }
+@media (max-width: 600px) {
+  .tabella thead { display: none; }
+  .tabella tr { display: block; padding: .5rem 0; border-bottom: 1px solid var(--linea); }
+  .tabella td { display: block; border: 0; padding: .15rem 0; }
+  .tabella td::before { content: attr(data-voce) ": "; font-weight: 600; color: var(--oro-testo); }
+}
+
+.legale-nav { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: 2.4rem; padding-top: 1.2rem; border-top: 1px solid var(--linea); font-size: .85rem; font-weight: 600; }
+.pie { text-align: center; font-size: .72rem; color: var(--inchiostro-tenue); padding: 0 1rem 1.6rem; }

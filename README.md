@@ -9,6 +9,11 @@ COSA C'E' IN QUESTO REPOSITORY
   index.html      la pagina (testi, stile e script sono tutti dentro questo file)
   logo.png        il logo
   logo-scuro.png  il logo con la scritta chiara, per il tema scuro (generato dal logo)
+  termini.html    termini e condizioni d'uso (note legali)
+  privacy.html    informativa sulla privacy (artt. 13 e 14 GDPR)
+  cookie.html     cookie policy
+  legale.css      stile delle tre pagine legali (stessi colori e temi della landing)
+  caratteri/      i caratteri tipografici, ospitati qui (licenza in caratteri/OFL.txt): la pagina non chiama Google Fonts
   foto/           qui vanno le due foto (vedi sotto)
   README.md       questo file
   recensioni.json valutazione, numero di recensioni e recensioni della scheda Google (aggiornato in automatico)
@@ -181,6 +186,25 @@ SAFARI 26 (LIQUID GLASS)
   Non spostarli sull'elemento fisso. La pagina arriva ai bordi dello schermo (viewport-fit=cover) e tiene
   conto dei margini di sicurezza con env(safe-area-inset-*): striscia della data sotto la barra di stato,
   barra dei pulsanti sopra l'indicatore Home, margini laterali con la tacca in orizzontale.
+
+NOTE LEGALI, PRIVACY E COOKIE
+  In fondo alla landing ci sono i dati del titolare (P.IVA obbligatoria in home page, art. 35 DPR 633/72) e i
+  collegamenti a termini.html, privacy.html e cookie.html. Le tre pagine sono scritte per questa landing:
+  niente vendite online, contatti via telefono e WhatsApp, recensioni prese da Google, caratteri in casa,
+  cookie solo per Google Ads e solo con consenso.
+  Da completare, una volta sola (i punti sono evidenziati in giallo nelle pagine, come nella landing):
+    - ragione sociale (o nome e cognome del titolare), via e numero civico, P.IVA, REA, PEC
+      -> pie' di pagina di index.html, termini.html (punto 2) e privacy.html (punto 1);
+    - fornitore di hosting effettivo (Hostinger oppure GitHub Pages) -> privacy.html, punto 3;
+    - condizioni e rimedio della garanzia sui tempi -> termini.html, punto 4 (le stesse della landing);
+    - le scelte gia' scritte, da confermare o cambiare: messaggi WhatsApp conservati al massimo 12 mesi,
+      recensioni conservate al massimo 30 giorni dopo che Google smette di fornirle, nessun DPO nominato.
+  Banner cookie: compare solo quando CONFIG.googleAdsId e' impostato. Prima della scelta non parte nulla verso
+  Google; "Accetta" carica il tag con la modalita' consenso, "Rifiuta" (o chiudere) non carica nulla; la scelta
+  resta 6 mesi in localStorage e si cambia da "Preferenze cookie" in fondo alla pagina. Senza ID Google Ads la
+  pagina non usa cookie e il banner non serve: la cookie policy lo dice.
+  Caratteri: Montserrat e Cormorant Garamond sono in caratteri/ (sottoinsieme latino dei font variabili di
+  Google Fonts, licenza SIL OFL): il browser dei visitatori non contatta piu' Google per i font.
 
 GOOGLE ADS
   Crea cinque conversioni (Portami li', Chiama, WhatsApp Lavoro, WhatsApp Sosta, WhatsApp generico),
