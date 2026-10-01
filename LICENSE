@@ -1,3 +1,22 @@
+AMBITO DELLA LICENZA / SCOPE OF THE LICENSE
+
+La licenza BSD a 3 clausole riportata sotto si applica al solo codice di questo repository: HTML, CSS e
+JavaScript di index.html e delle pagine legali, legale.css, la cartella scripts/, i file PHP, i workflow.
+Sono esclusi e restano riservati (tutti i diritti riservati, Lido Pino d'Oro): i testi della pagina e
+delle note legali, le fotografie in foto/, logo.png, logo-scuro.png, le icone del sito. I caratteri in
+caratteri/ sono distribuiti esclusivamente secondo la SIL Open Font License 1.1 (caratteri/OFL.txt).
+Le recensioni e i dati della scheda Google, quando presenti, sono contenuti di Google soggetti alle
+condizioni di Google Maps Platform e non sono concessi in licenza.
+
+The BSD 3-Clause License below covers only the code in this repository (HTML, CSS and JavaScript of
+index.html and the legal pages, legale.css, the scripts/ folder, the PHP files, the workflows). Page
+and legal texts, the photographs in foto/, logo.png, logo-scuro.png and the site icons are excluded and
+remain reserved (all rights reserved, Lido Pino d'Oro). The fonts in caratteri/ are distributed solely
+under the SIL Open Font License 1.1 (caratteri/OFL.txt). Google listing data and reviews, when present,
+are Google content subject to the Google Maps Platform terms and are not licensed.
+
+-----------------------------------------------------------------------------------------------------
+
 BSD 3-Clause License
 
 Copyright (c) 2026, RistorantePinodOro

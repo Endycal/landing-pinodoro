@@ -18,15 +18,18 @@ const USCITA = new URL("../recensioni.json", import.meta.url);
 const CAMPI = "id,displayName,rating,userRatingCount,reviews,googleMapsUri";
 const LINGUE = ["it", "en"]; // Google da' 5 recensioni per lingua: la prima e' la principale (voto, conteggio, testi in italiano),
                              // le altre aggiungono le recensioni scritte in quella lingua, mostrate nella loro lingua.
-const MEMORIA_GIORNI = 30;  // le recensioni uscite dalle 5 di Google restano visibili fino a 30 giorni dall'ultima volta viste (limite di Google)
-const MASSIMO_TUTTE = 12;   // numero massimo di recensioni conservate nel file
+const MEMORIA_GIORNI = 0;   // nessuna conservazione: il file contiene solo le recensioni che Google fornisce oggi (le condizioni di Google
+                            // non consentono di tenere in cache recensioni e nomi; solo il Place ID puo' essere conservato)
+const MASSIMO_TUTTE = 10;   // numero massimo di recensioni nel file (5 per lingua)
+const ETA_MASSIMA_GIORNI = 730; // recensioni piu' vecchie di due anni non entrano (legge 11 marzo 2026, n. 34)
+const TESTO_MIN_FILE = 20;  // recensioni piu' corte non entrano nel file (stessa soglia della giostra in index.html)
 const TESTO_MAX = 320;      // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
 const TESTO_MIN = 40;       // recensioni piu' corte non vengono scelte
 const VALUTAZIONE_MIN = 4;  // recensioni con meno stelle non vengono scelte
 // Parole che, anche in una recensione a 5 stelle, non vogliamo in evidenza: la recensione viene lasciata fuori.
 const PAROLE_ESCLUSE = ["rubbish", "terrible", "awful", "horrible", "disgusting", "worst", "rude", "dirty", "overpriced", "rip off", "rip-off", "scam", "avoid", "never again", "disappoint", "unfriendly",
   "pessim", "orribil", "terribil", "schifo", "maleducat", "sporc", "delus", "scaden", "sconsigli", "mai più", "mai piu", "da evitare", "fregatura", "vergogn"];
-// Esclusioni manuali: righe di recensioni-escluse.txt (nome abbreviato come appare nella pagina, es. "Tania G.", o un pezzo del link).
+// Esclusioni manuali: righe di recensioni-escluse.txt (meglio un pezzo del link della recensione; oppure il nome come appare su Google).
 const FILE_ESCLUSE = new URL("../recensioni-escluse.txt", import.meta.url);
 
 // Una recensione per ciascuna categoria del documento della campagna, in quest'ordine.
@@ -93,13 +96,6 @@ function quandoItaliano(publishTime, adesso) {
   return anni <= 1 ? "un anno fa" : `${anni} anni fa`;
 }
 
-function nomeBreve(nome) {
-  const parti = String(nome || "").trim().split(/\s+/).filter(Boolean);
-  if (!parti.length) return "Cliente Google";
-  if (parti.length === 1) return parti[0];
-  return `${parti[0]} ${parti[parti.length - 1].charAt(0).toUpperCase()}.`;
-}
-
 function accorcia(testo) {
   if (testo.length <= TESTO_MAX) return { testo, troncata: false };
   const taglio = testo.lastIndexOf(" ", TESTO_MAX);
@@ -153,21 +149,28 @@ function unisci(nuove, precedente, adesso) {
 }
 
 function normalizza(dati, extra, precedente, adesso) {
+  // Attribuzione come la fornisce Google (nome pubblico scelto dall'autore, link al profilo, link alla recensione, link per
+  // segnalare): le condizioni di Google Maps Platform non permettono di modificarla. Il testo e' quello originale dell'autore,
+  // mai la traduzione automatica di Google. La data e' conservata con precisione al giorno (minimizzazione).
   const converti = (r, lingua) => {
-    const testoIntero = String(r.text?.text || r.originalText?.text || "").replace(/\s+/g, " ").trim();
+    const testoIntero = String(r.originalText?.text || r.text?.text || "").replace(/\s+/g, " ").trim();
     const { testo, troncata } = accorcia(testoIntero);
     return {
-      autore: nomeBreve(r.authorAttribution?.displayName),
+      autore: String(r.authorAttribution?.displayName || "Utente Google").trim(),
+      autoreLink: r.authorAttribution?.uri || "",
       valutazione: Number(r.rating) || 0,
       testo, troncata, testoIntero,
       quando: quandoItaliano(r.publishTime, adesso),
-      data: r.publishTime || "",
+      data: String(r.publishTime || "").slice(0, 10),
       link: r.googleMapsUri || dati.googleMapsUri || "",
+      segnala: r.flagContentUri || "",
       lingua,
     };
   };
-  // Lingua principale: tutto (i testi sono in italiano, tradotti da Google se serve).
-  const scaricate = (dati.reviews || []).map((r) => converti(r, LINGUE[0])).filter((r) => r.testoIntero);
+  // Lingua principale: solo le recensioni scritte davvero in quella lingua (le altre arriverebbero tradotte da Google).
+  const scaricate = (dati.reviews || [])
+    .filter((r) => !r.originalText?.languageCode || r.originalText.languageCode === LINGUE[0])
+    .map((r) => converti(r, LINGUE[0])).filter((r) => r.testoIntero);
   // Altre lingue: solo le recensioni scritte davvero in quella lingua e non gia' presenti.
   const presenti = new Set(scaricate.map(chiaveRecensione));
   for (const { lingua, reviews } of extra) {
@@ -180,7 +183,11 @@ function normalizza(dati, extra, precedente, adesso) {
     }
   }
   const manuali = escluseManuali();
+  // Nel file restano solo le recensioni che la pagina puo' mostrare (minimizzazione, art. 5.1.c GDPR):
+  // abbastanza stelle, testo non troppo corto, non piu' vecchie di due anni, nessuna parola esclusa, nessuna esclusione manuale.
   const tutte = unisci(scaricate.map(({ testoIntero, ...r }) => ({ ...r, testoIntero })), precedente, adesso)
+    .filter((r) => r.valutazione >= VALUTAZIONE_MIN && (r.testoIntero ?? r.testo).length >= TESTO_MIN_FILE)
+    .filter((r) => !r.data || adesso - Date.parse(r.data) <= ETA_MASSIMA_GIORNI * 86400000)
     .filter((r) => !daEscludere({ ...r, testoIntero: r.testoIntero ?? r.testo }, manuali));
   return {
     aggiornato: new Date(adesso).toISOString(),

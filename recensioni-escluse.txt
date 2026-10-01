@@ -1,4 +1,6 @@
 # Recensioni da non mostrare mai nella pagina, una per riga.
-# Scrivi il nome abbreviato come compare nella pagina (es. "Tania G.") oppure un pezzo del link della recensione su Google.
+# Scrivi preferibilmente un pezzo del link della recensione su Google (per esempio il codice dopo "/reviews/"),
+# cosi' in questo file non compare nessun nome. In alternativa il nome dell'autore come appare su Google.
 # Le righe che iniziano con # sono commenti. Oltre a questo elenco, vengono escluse in automatico le recensioni
 # che contengono parole negative (elenco PAROLE_ESCLUSE negli script), anche se hanno 5 stelle.
+# Questo file non viene pubblicato: su GitHub Pages resta fuori dai file caricati, su Hostinger e' bloccato da .htaccess.

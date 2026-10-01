@@ -44,16 +44,20 @@
     DATI DA COMPLETARE PRIMA DELLA PUBBLICAZIONE
     [ ] Contenuto e prezzo del menu Smart        -> precompilato dal menu stampato (EUR 16,70): confermare
     [ ] Contenuto e prezzo del menu Plus         -> precompilato dal menu stampato (EUR 25,70): confermare
-    [ ] Condizioni esatte della garanzia sui tempi (oppure usare la frase alternativa, vedi commento nella scheda "pausa pranzo")
+    [ ] Tempi di servizio: oggi sono un impegno ("ti serviamo in 30 minuti"), non una garanzia. Per scrivere "garantito"
+        servono condizioni e rimedio, da mettere sia nella scheda "pausa pranzo" sia in termini.html (punto 4)
+    [ ] Giorni di validita' del menu PLUS       -> scheda "pausa pranzo" (segnaposto) e termini.html, punto 3
+    [ ] Coperto per i piatti alla carta         -> nota sotto i piatti (segnaposto) e termini.html, punto 3
+    [ ] Chiusure: la pagina dice "tutti i giorni dell'anno": confermare che non esistono giorni di riposo o chiusure stagionali
     [ ] 2 piatti "del territorio" con prezzo    -> proposti dal menu stampato (Alici del Tirreno EUR 13,00; Salmone al Falerno EUR 18,00): confermare o sostituire
     [ ] Orari del pranzo                        -> CONFIG.orarioPranzo
-    [ ] Parcheggio                              -> domande frequenti
-    [ ] Pagamento con carta                     -> domande frequenti
-    [ ] Cani ammessi si'/no                     -> domande frequenti
-    [ ] Indirizzo e indicazione della svolta dalla Domiziana -> domande frequenti e chiusura
+    [ ] Parcheggio e cani                       -> domande frequenti: le due domande sono in un commento HTML, nascoste
+                                                   finche' non c'e' la risposta (una domanda con "[da completare]" online non va bene)
+    [x] Pagamento con carta                     -> domande frequenti: "Si'" (accettare le carte e' obbligatorio per legge)
+    [ ] Indirizzo (chiusura) e svolta dalla Domiziana (commento nelle domande frequenti)
     [x] Recensioni Google: automatiche (recensioni.json, rigenerato ogni mattina dal workflow "Aggiorna le recensioni Google"
         con il secret GOOGLE_PLACES_API_KEY del repository; su Hostinger: aggiorna-recensioni.php con il cron di hPanel,
-        vedi README "SU HOSTINGER"). I tre segnaposto qui sotto compaiono solo se il file e' vuoto.
+        vedi README "SU HOSTINGER"). Senza dati la sezione mostra solo il link alla scheda Google: niente segnaposto.
     [ ] Foto dello Spaghetto ai Lupini (blocco 3) -> cartella foto/; facoltativa: il tavolo sulla spiaggia d'inverno (in alto)
     [x] Tema scuro: segue il sistema, pulsante sole/luna nella testata; colori nelle variabili in cima al CSS
     [x] Place ID della scheda Google            -> CONFIG.googlePlaceId (scheda "Ristorante Pino D'Oro", Mondragone)
@@ -321,6 +325,13 @@
     .piatti li span:last-child { color: var(--oro-testo); font-weight: 600; white-space: nowrap; }
     [data-g="sosta"] .scheda-sosta { order: -1; }
 
+    .nota-prezzi { font-size: .76rem; color: var(--inchiostro-tenue); margin-top: .15rem; line-height: 1.5; }
+    .attribuzione-google { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--inchiostro-tenue); margin-top: .9rem; }
+    .nota-recensioni { font-size: .76rem; color: var(--inchiostro-tenue); line-height: 1.55; margin-top: .5rem; }
+    .recensione cite a { color: inherit; border-bottom: 1px solid var(--linea); }
+    .recensione cite .segnala { font-weight: 500; letter-spacing: .06em; text-transform: none; }
+    .nota-recensioni a, .invito a { color: var(--oro-testo); font-weight: 600; border-bottom: 1px solid var(--linea); white-space: nowrap; }
+
     /* Blocco 3 - Il pregiudizio da smontare */
     .pregiudizio-griglia { display: grid; gap: 1.2rem; }
     .pregiudizio-griglia p + p { margin-top: .8rem; }
@@ -391,14 +402,20 @@
     .consenso { position: fixed; left: 0; right: 0; bottom: calc(var(--barra) + env(safe-area-inset-bottom) + .6rem); z-index: 45; padding: 0 .75rem; }
     .consenso[hidden] { display: none; }
     .consenso-scatola {
-      width: min(var(--max), 100%); margin-inline: auto; background: var(--superficie); border: 1px solid var(--oro);
-      border-radius: var(--raggio); box-shadow: var(--ombra); padding: 1rem 1.1rem;
+      position: relative; width: min(var(--max), 100%); margin-inline: auto; background: var(--superficie); border: 1px solid var(--oro);
+      border-radius: var(--raggio); box-shadow: var(--ombra); padding: 1rem 3rem 1rem 1.1rem;
       display: grid; gap: .8rem;
     }
+    .consenso-chiudi {
+      position: absolute; top: .5rem; right: .5rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+      border: 1px solid var(--linea); background: var(--superficie); color: var(--oro-testo);
+      font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 0;
+    }
+    .consenso-chiudi:focus-visible { outline: 2px solid var(--oro-testo); outline-offset: 2px; }
     .consenso-scatola p { font-size: .84rem; line-height: 1.5; }
     .consenso-scatola a { color: var(--oro-testo); font-weight: 600; border-bottom: 1px solid var(--linea); white-space: nowrap; }
     .consenso-azioni { display: flex; gap: .6rem; justify-content: flex-end; flex-wrap: wrap; }
-    .consenso-azioni .btn { min-height: 2.6rem; padding: .55rem 1.1rem; }
+    .consenso-azioni .btn { min-height: 2.6rem; padding: .55rem 1.1rem; flex: 1 1 8rem; }
     @media (min-width: 820px) { .consenso-scatola { grid-template-columns: 1fr auto; align-items: center; } }
 
     /* Pulsanti fissi in basso */
@@ -508,13 +525,14 @@
           <div class="icona" aria-hidden="true"><svg><use href="#i-valigetta"/></svg></div>
           <h2>Sei in pausa pranzo?</h2>
           <!--
-            Se la garanzia sui tempi non e' ancora rispettata al 100%, sostituire le righe "garantito"
-            (le due frasi "Servito in ... minuti, garantito." e la riga "Se sforiamo i tempi, ...") con:
-            "Dillo al cameriere quando ti siedi: ti serviamo in 30 minuti."
+            Tempi di servizio: oggi sono un impegno, non una garanzia. La parola "garantito" puo' tornare solo quando
+            condizioni e rimedio sono decisi e scritti sia qui sia in termini.html (punto 4), per esempio:
+            "Servito in 30 minuti, garantito. Se sforiamo i tempi, il caffe' e il dolce sono offerti. Vale per tavoli
+            fino a 4 persone con ordine entro le 14:00 (<a href="termini.html#tempi">condizioni</a>)."
+            Una garanzia pubblicata senza condizioni e' un'omissione ingannevole (art. 22 Codice del consumo).
           -->
-          <p><strong class="etichetta">SMART, € 16,70</strong>: un piatto a scelta tra sei, con acqua, caffè, pane e coperto, dal lunedì al venerdì esclusi festivi. Servito in 30 minuti, garantito.</p>
-          <p><strong class="etichetta">PLUS, € 25,70</strong>: un primo e un secondo a scelta, con acqua, caffè, pane e coperto. Servito in 45 minuti, garantito.</p>
-          <p>Se sforiamo i tempi, <span class="dc">[condizione della garanzia]</span>.</p>
+          <p><strong class="etichetta">SMART, € 16,70</strong>: un piatto a scelta tra sei, con acqua, caffè, pane e coperto, dal lunedì al venerdì esclusi festivi. Dillo al cameriere quando ti siedi: ti serviamo in 30 minuti.</p>
+          <p><strong class="etichetta">PLUS, € 25,70</strong>: un primo e un secondo a scelta, con acqua, caffè, pane e coperto, <span class="dc">[tutti i giorni / dal lunedì al venerdì esclusi festivi]</span>. Servito in 45 minuti.</p>
           <p>Fattura al tavolo, subito.<br><strong>Porti un cliente?</strong> Ti riserviamo un tavolo tranquillo sulla spiaggia, dove si parla.</p>
           <a class="btn btn-scuro btn-largo" data-azione="whatsapp-lavoro" href="https://wa.me/393887877008?text=DOMIZIANA%20LAVORO%20%E2%80%93%20arrivo%20tra%2010%20minuti%2C%20siamo%20in%20%5B%20%5D" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp: arrivo per pranzo</a>
         </article>
@@ -529,6 +547,7 @@
             <li><span class="dc">Alici del nostro Tirreno</span><span class="dc">€ 13,00</span></li>
             <li><span class="dc">Salmone in crosta al Falerno del Massico</span><span class="dc">€ 18,00</span></li>
           </ul>
+          <p class="nota-prezzi">Prezzi IVA inclusa. Coperto: <span class="dc">[€ x,xx a persona, oppure: incluso]</span>; nei menu SMART e PLUS è già compreso.</p>
           <p><strong>Con i bambini?</strong> C'è il menù baby, e mentre aspettate possono sgranchirsi le gambe in spiaggia.</p>
           <a class="btn btn-scuro btn-largo" data-azione="whatsapp-sosta" href="https://wa.me/393887877008?text=DOMIZIANA%20SOSTA%20%E2%80%93%20arriviamo%20tra%2010%20minuti%2C%20siamo%20in%20%5B%20%5D%20(bambini%3A%20%5B%20%5D)" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp: siamo in viaggio, arriviamo</a>
         </article>
@@ -573,31 +592,15 @@
     <div class="ornamento" aria-hidden="true"><span></span></div>
 
     <!-- ================= BLOCCO 4 - La prova ================= -->
-    <!-- Solo recensioni vere, copiate parola per parola da Google, con link alla scheda. -->
-    <section class="sezione" aria-labelledby="titolo-prova">
+    <!-- Solo recensioni vere della scheda Google, caricate da recensioni.json dallo script in fondo alla pagina.
+         La sezione resta nascosta finche' i dati non arrivano: nessun segnaposto, nessuna stella finta, nessun numero
+         scritto a mano (voto e totale li scrive lo script dalla scheda). Se il file manca, compare solo il link alla scheda. -->
+    <section class="sezione" aria-labelledby="titolo-prova" id="sezione-prova" hidden>
       <div class="contenitore">
         <span class="occhiello">La prova</span>
-        <h2 class="titolo-sezione" id="titolo-prova">4,6 su Google, con 557 recensioni</h2>
-        <!-- Le tre recensioni qui sotto sono segnaposto: quando recensioni.json contiene dati (workflow "Aggiorna le recensioni Google"),
-             lo script in fondo alla pagina le sostituisce con le recensioni vere della scheda Google, e aggiorna anche il titolo. -->
+        <h2 class="titolo-sezione" id="titolo-prova">Le recensioni dei nostri clienti su Google</h2>
         <div class="recensioni-giostra" id="recensioni-giostra" role="region" aria-roledescription="giostra" aria-label="Recensioni dei clienti">
-        <div class="recensioni" id="recensioni" aria-live="off">
-          <blockquote class="recensione">
-            <div class="stelle" aria-label="Cinque stelle"><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg></div>
-            <p>"<span class="dc">[recensione vera: pranzo di lavoro, tempi o servizio]</span>"</p>
-            <cite><span class="dc">[nome e iniziale]</span></cite>
-          </blockquote>
-          <blockquote class="recensione">
-            <div class="stelle" aria-label="Cinque stelle"><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg></div>
-            <p>"<span class="dc">[recensione vera: chi era di passaggio, famiglia o coppia in viaggio]</span>"</p>
-            <cite><span class="dc">[nome e iniziale]</span></cite>
-          </blockquote>
-          <blockquote class="recensione">
-            <div class="stelle" aria-label="Cinque stelle"><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg><svg aria-hidden="true"><use href="#i-stella"/></svg></div>
-            <p>"<span class="dc">[recensione vera: il cibo, meglio se i Lupini]</span>"</p>
-            <cite><span class="dc">[nome e iniziale]</span></cite>
-          </blockquote>
-        </div>
+        <div class="recensioni" id="recensioni" aria-live="off"></div>
         <div class="recensioni-comandi" id="recensioni-comandi" role="group" aria-label="Comandi delle recensioni" hidden>
           <button type="button" class="recensioni-freccia indietro" data-giostra="-1" aria-label="Recensioni precedenti"><svg aria-hidden="true"><use href="#i-freccia"/></svg></button>
           <div class="recensioni-punti" id="recensioni-punti" role="group" aria-label="Posizione"></div>
@@ -605,6 +608,12 @@
           <button type="button" class="recensioni-freccia" id="recensioni-pausa" aria-pressed="false" aria-label="Ferma lo scorrimento automatico" hidden><svg aria-hidden="true"><use href="#i-pausa"/></svg></button>
         </div>
         </div>
+        <!-- Attribuzione richiesta dalle condizioni di Google Maps Platform quando i dati Places sono mostrati senza mappa.
+             Google chiede il logo "Google Maps" (da scaricare dalla pagina delle linee guida di attribuzione di Google Maps
+             Platform, senza modificarlo): metterlo qui al posto del testo, in versione per sfondo chiaro e scuro. -->
+        <p class="attribuzione-google">Voto e recensioni forniti da Google Maps</p>
+        <!-- Avviso richiesto dal Codice del consumo (art. 22, comma 5-bis) e dalla legge 34/2026: come scegliamo e ordiniamo le recensioni -->
+        <p class="nota-recensioni" id="nota-recensioni">Selezione automatica tra le recensioni che Google fornisce per la scheda <span id="nome-scheda">Google del ristorante</span> (le più pertinenti, in italiano e in inglese): mostriamo solo quelle con almeno 4 stelle, senza espressioni negative e pubblicate da meno di due anni, e togliamo quelle i cui autori chiedono di non comparire. In evidenza prima una recensione sul servizio, una sul viaggio e una sul cibo, poi le altre (prima in italiano, poi per voto e data). Non le verifichiamo noi: autenticità e regole sono di Google. Il voto medio e il numero totale comprendono tutte le recensioni, anche quelle non mostrate. <a href="termini.html#recensioni">Come le scegliamo</a></p>
         <a class="link-oro" data-link="recensioni" href="https://www.google.com/maps/search/?api=1&amp;query=Lido%20Pino%20d%27Oro" target="_blank" rel="noopener">Leggi tutte le recensioni su Google <svg aria-hidden="true"><use href="#i-freccia"/></svg></a>
       </div>
     </section>
@@ -617,14 +626,20 @@
         <span class="occhiello">Domande frequenti</span>
         <h2 class="titolo-sezione" id="titolo-domande">Prima di metterti in strada</h2>
         <dl class="domande">
-          <div><dt>Siete aperti oggi?</dt><dd>Sì. A pranzo tutti i giorni dell'anno, Natale e Ferragosto compresi.</dd></div>
-          <div><dt>Quanto siete lontani dalla Domiziana?</dt><dd>300 metri, un minuto di macchina. <span class="dc">[Svolta all'altezza di …]</span></dd></div>
+          <div><dt>Siete aperti oggi?</dt><dd>Sì. A pranzo tutti i giorni dell'anno, Natale e Ferragosto compresi, salvo chiusure straordinarie per maltempo o eventi: in caso di dubbio chiama, o guarda gli orari sulla scheda Google.</dd></div>
+          <!-- Quando si conosce la svolta, aggiungerla qui: "300 metri, un minuto di macchina: svolta all'altezza di ..." -->
+          <div><dt>Quanto siete lontani dalla Domiziana?</dt><dd>300 metri, un minuto di macchina dalla via Domiziana.</dd></div>
           <div><dt>Quanto ci vuole a pranzo?</dt><dd>Un'ora con calma, 30 minuti con il menù Smart.</dd></div>
           <div><dt>Fate fattura?</dt><dd>Sì, al tavolo, subito.</dd></div>
-          <div><dt>Dove parcheggio?</dt><dd><span class="dc">[da completare]</span></dd></div>
-          <div><dt>Si paga con la carta?</dt><dd><span class="dc">[da completare]</span></dd></div>
-          <div><dt>Accettate cani?</dt><dd><span class="dc">[da completare]</span></dd></div>
-          <div><dt>Devo prenotare?</dt><dd>No, ma se scrivi su WhatsApp trovi il tavolo pronto.</dd></div>
+          <!-- Domande senza risposta: restano nascoste finche' il titolare non la scrive (una domanda pubblicata con
+               "[da completare]" e' un'informazione mancante per il visitatore). Per attivarle, togliere i commenti.
+          <div><dt>Dove parcheggio?</dt><dd>...</dd></div>
+          <div><dt>Accettate cani?</dt><dd>...</dd></div>
+          -->
+          <!-- Accettare le carte e' un obbligo di legge per chi vende al dettaglio (art. 15, commi 4 e 4-bis, D.L. 179/2012):
+               la risposta non puo' essere "no" ne' "solo sopra una certa cifra". -->
+          <div><dt>Si paga con la carta?</dt><dd>Sì, con tutte le carte (bancomat, credito, prepagate) e in contanti.</dd></div>
+          <div><dt>Devo prenotare?</dt><dd>No. Se scrivi su WhatsApp prima di partire ti teniamo un tavolo, se disponibile, e ti rispondiamo per conferma.</dd></div>
         </dl>
       </div>
     </section>
@@ -634,7 +649,7 @@
       <div class="contenitore">
         <span class="occhiello">Offerta di benvenuto</span>
         <h2 class="titolo-sezione" id="titolo-chiusura">Stai passando dalla Domiziana?</h2>
-        <p class="invito">Scrivici su WhatsApp prima di arrivare: trovi il tavolo pronto e <strong>il caffè te lo offriamo noi</strong>.</p>
+        <p class="invito">Scrivici su WhatsApp prima di arrivare: ti facciamo trovare il tavolo pronto (ti confermiamo con un messaggio) e <strong>il caffè te lo offriamo noi</strong> (un caffè a persona per chi pranza; <a href="termini.html#offerta">condizioni</a>).</p>
         <div class="azioni">
           <a class="btn btn-scuro" data-azione="whatsapp-generico" href="https://wa.me/393887877008?text=DOMIZIANA%20%E2%80%93%20arrivo%20tra%2010%20minuti%2C%20siamo%20in%20%5B%20%5D" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp</a>
           <a class="btn btn-oro" data-azione="portami-li" href="https://www.google.com/maps/search/?api=1&amp;query=Lido%20Pino%20d%27Oro" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Portami lì</a>
@@ -652,13 +667,16 @@
     </div>
   </footer>
 
-  <!-- Banner cookie (Linee guida del Garante 10 giugno 2021): "Accetta" e "Rifiuta" di pari evidenza, nessun cookie prima
-       della scelta, scelta ricordata 6 mesi, riapribile da "Preferenze cookie". Compare solo con CONFIG.googleAdsId impostato. -->
+  <!-- Banner cookie (Linee guida del Garante 10 giugno 2021): "Accetta" e "Rifiuta" identici per dimensioni, colori e
+       caratteri; X in alto a destra (e tasto Esc) che chiude mantenendo le impostazioni predefinite, cioe' senza cookie;
+       nessun cookie prima della scelta; scelta ricordata 6 mesi; riapribile da "Preferenze cookie".
+       Compare solo con CONFIG.googleAdsId impostato. -->
   <div class="consenso" id="consenso" role="region" aria-label="Uso dei cookie" hidden>
     <div class="consenso-scatola">
-      <p><strong>Cookie per misurare gli annunci.</strong> Se accetti, Google Ads registra le azioni sui pulsanti (indicazioni, chiamata, WhatsApp) per capire quali annunci funzionano. Senza il tuo consenso non installiamo alcun cookie. Puoi cambiare idea da "Preferenze cookie" in fondo alla pagina. <a href="cookie.html">Cookie policy</a> · <a href="privacy.html">Privacy</a></p>
+      <button type="button" class="consenso-chiudi" data-consenso="rifiutati" aria-label="Chiudi e mantieni le impostazioni predefinite: nessun cookie di marketing">&times;</button>
+      <p><strong>Cookie per misurare gli annunci.</strong> Se accetti, Google Ads registra la visita e le azioni sui pulsanti (indicazioni, chiamata, WhatsApp) per capire quali annunci funzionano. Senza il tuo consenso non installiamo alcun cookie: chiudendo il banner con la X resti con le impostazioni predefinite. Puoi cambiare idea da "Preferenze cookie" in fondo alla pagina. <a href="cookie.html">Cookie policy</a> · <a href="privacy.html">Privacy</a></p>
       <div class="consenso-azioni">
-        <button type="button" class="btn btn-contorno" data-consenso="rifiutati">Rifiuta</button>
+        <button type="button" class="btn btn-oro" data-consenso="rifiutati">Rifiuta</button>
         <button type="button" class="btn btn-oro" data-consenso="accettati">Accetta</button>
       </div>
     </div>
@@ -761,7 +779,7 @@
       var urlMaps = "https://www.google.com/maps/search/?api=1&query=" + nome +
         (CONFIG.googlePlaceId ? "&query_place_id=" + encodeURIComponent(CONFIG.googlePlaceId) : "");
       var urlRecensioni = CONFIG.googlePlaceId
-        ? "https://search.google.com/local/reviews?placeid=" + encodeURIComponent(CONFIG.googlePlaceId)
+        ? "https://www.google.com/maps/place/?q=place_id:" + encodeURIComponent(CONFIG.googlePlaceId)
         : urlMaps;
       function urlWhatsapp(testo) { return "https://wa.me/" + cifre + "?text=" + encodeURIComponent(testo); }
       var link = {
@@ -777,13 +795,29 @@
       // cosa della pagina che usa cookie: viene caricato solo se configurato E solo dopo l'"Accetta" nel banner
       // (scelta ricordata 6 mesi in localStorage "cookie-consenso"). Senza consenso non parte nulla verso Google.
       window.dataLayer = window.dataLayer || [];
-      var consenso = { chiave: "cookie-consenso", giorni: 180, banner: document.getElementById("consenso"), link: document.getElementById("preferenze-cookie"), adsCaricato: false };
+      var consenso = { chiave: "cookie-consenso", mesi: 6, banner: document.getElementById("consenso"), link: document.getElementById("preferenze-cookie"), adsCaricato: false };
+      // La scelta vale 6 mesi di calendario (il Garante chiede di non riproporre il banner prima di 6 mesi); scaduta, viene cancellata.
       function consensoLeggi() {
         try {
           var v = JSON.parse(localStorage.getItem(consenso.chiave) || "null");
-          if (v && (v.scelta === "accettati" || v.scelta === "rifiutati") && Date.now() - v.quando < consenso.giorni * 864e5) return v.scelta;
+          if (v && (v.scelta === "accettati" || v.scelta === "rifiutati")) {
+            var scadenza = new Date(v.quando); scadenza.setMonth(scadenza.getMonth() + consenso.mesi);
+            if (Date.now() < scadenza.getTime()) return v.scelta;
+            localStorage.removeItem(consenso.chiave);
+          }
         } catch (e) {}
         return "";
+      }
+      // Revoca: cancella i cookie e le memorie che il tag di Google Ads ha impostato su questo dominio
+      function cancellaCookieAds() {
+        var parti = window.location.hostname.split(".");
+        document.cookie.split(";").forEach(function (c) {
+          var nome = c.split("=")[0].trim();
+          if (nome.indexOf("_gcl_") !== 0 && nome.indexOf("_gac_") !== 0) return;
+          document.cookie = nome + "=; Max-Age=0; path=/";
+          for (var i = 0; i < parti.length - 1; i++) document.cookie = nome + "=; Max-Age=0; path=/; domain=" + parti.slice(i).join(".");
+        });
+        try { localStorage.removeItem("_gcl_ls"); sessionStorage.removeItem("_gcl_ss"); } catch (e) {}
       }
       function consensoSalva(scelta) { try { localStorage.setItem(consenso.chiave, JSON.stringify({ scelta: scelta, quando: Date.now() })); } catch (e) {} }
       function caricaAds() {
@@ -806,9 +840,19 @@
             var scelta = b.getAttribute("data-consenso");
             consensoSalva(scelta);
             consenso.banner.hidden = true;
-            if (scelta === "accettati") caricaAds();
-            else if (consenso.adsCaricato) window.gtag("consent", "update", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
+            if (scelta === "accettati") {
+              if (consenso.adsCaricato) window.gtag("consent", "update", { ad_storage: "granted", ad_user_data: "granted" });
+              else caricaAds();
+            } else if (consenso.adsCaricato) {
+              // Revoca dopo un consenso: il tag smette di usare i cookie, poi li cancelliamo e ricarichiamo la pagina senza tag
+              window.gtag("consent", "update", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
+              cancellaCookieAds();
+              window.location.reload();
+            }
           });
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && !consenso.banner.hidden) consenso.banner.querySelector(".consenso-chiudi").click();
         });
         var sceltaSalvata = consensoLeggi();
         if (sceltaSalvata === "accettati") caricaAds();
@@ -838,7 +882,7 @@
       // Se CONFIG.googlePlaceId e' vuoto ma recensioni.json contiene il Place ID della scheda, i link Google usano quello.
       function impostaLinkGoogle(placeId) {
         var maps = "https://www.google.com/maps/search/?api=1&query=" + nome + "&query_place_id=" + encodeURIComponent(placeId);
-        var rec = "https://search.google.com/local/reviews?placeid=" + encodeURIComponent(placeId);
+        var rec = "https://www.google.com/maps/place/?q=place_id:" + encodeURIComponent(placeId);
         Array.prototype.forEach.call(document.querySelectorAll("[data-azione='portami-li']"), function (a) { a.setAttribute("href", maps); });
         Array.prototype.forEach.call(document.querySelectorAll("[data-link='recensioni']"), function (a) { a.setAttribute("href", rec); });
       }
@@ -853,14 +897,22 @@
         var use = document.createElementNS(NS, "use"); use.setAttribute("href", "#i-stella"); use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#i-stella");
         svg.appendChild(use); return svg;
       }
+      // Senza dati (file assente, vuoto o non raggiungibile) la sezione mostra solo titolo e link alla scheda Google:
+      // mai recensioni segnaposto o stelle non vere.
+      function senzaRecensioni() {
+        document.getElementById("recensioni-giostra").hidden = true;
+        document.getElementById("nota-recensioni").hidden = true;
+        document.getElementById("sezione-prova").hidden = false;
+      }
       function mostraRecensioni(dati) {
-        if (!dati || !dati.scelte || !dati.scelte.length) return;
+        if (!dati || !dati.scelte || !dati.scelte.length) { senzaRecensioni(); return; }
         if (typeof dati.valutazione === "number" && dati.numeroRecensioni) {
           document.getElementById("titolo-prova").textContent =
             dati.valutazione.toFixed(1).replace(".", ",") + " su Google, con " + dati.numeroRecensioni + " recensioni";
         }
+        if (dati.nome) document.getElementById("nome-scheda").textContent = "«" + dati.nome + "»";
         // Nella giostra vanno le tre scelte e poi tutte le altre recensioni del file con abbastanza stelle
-        // (CONFIG.recensioniStelleMinime), comprese quelle uscite dalle 5 di Google e conservate fino a 30 giorni.
+        // (CONFIG.recensioniStelleMinime).
         var stelleMinime = Number(CONFIG.recensioniStelleMinime) || 0;
         var carte = dati.scelte.slice(0, 3).filter(function (r) { return Number(r.valutazione) >= stelleMinime; });
         var viste = {};
@@ -869,7 +921,7 @@
           var chiave = r.autore + "|" + r.testo;
           if (!viste[chiave] && Number(r.valutazione) >= stelleMinime && String(r.testo || "").length >= 20) { viste[chiave] = true; carte.push(r); }
         });
-        if (!carte.length) return;
+        if (!carte.length) { senzaRecensioni(); return; }
         var contenitore = document.getElementById("recensioni");
         contenitore.textContent = "";
         carte.forEach(function (r) {
@@ -879,18 +931,34 @@
           stelle.setAttribute("aria-label", n + " stelle su 5");
           for (var i = 0; i < n; i++) stelle.appendChild(iconaStella());
           var p = document.createElement("p"); p.textContent = '"' + r.testo + '"';
-          if (r.troncata && r.link) {
+          // Ogni recensione ha sempre il collegamento alla sua versione originale su Google Maps (condizioni di Google Maps Platform).
+          if (r.link) {
             var leggi = document.createElement("a"); leggi.className = "leggi-tutto";
-            leggi.href = r.link; leggi.target = "_blank"; leggi.rel = "noopener"; leggi.textContent = "Leggi tutto";
+            leggi.href = r.link; leggi.target = "_blank"; leggi.rel = "noopener"; leggi.textContent = r.troncata ? "Leggi tutto su Google" : "Vedi su Google";
             p.appendChild(document.createTextNode(" ")); p.appendChild(leggi);
           }
           var NOMI_LINGUE = { en: "in inglese", de: "in tedesco", fr: "in francese", es: "in spagnolo" };
           var lingua = r.lingua && r.lingua !== "it" ? (NOMI_LINGUE[r.lingua] || "in " + r.lingua) : "";
-          var cite = document.createElement("cite"); cite.textContent = r.autore + (r.quando ? " · " + r.quando : "") + (lingua ? " · " + lingua : "");
+          // Attribuzione dell'autore come la fornisce Google: nome pubblico con il collegamento al profilo, e il link per segnalare.
+          var cite = document.createElement("cite");
+          if (r.autoreLink) {
+            var autore = document.createElement("a"); autore.href = r.autoreLink; autore.target = "_blank"; autore.rel = "noopener"; autore.textContent = r.autore;
+            cite.appendChild(autore);
+          } else {
+            cite.appendChild(document.createTextNode(r.autore));
+          }
+          cite.appendChild(document.createTextNode((r.quando ? " · " + r.quando : "") + (lingua ? " · " + lingua : "")));
+          if (r.segnala) {
+            var segnala = document.createElement("a"); segnala.className = "segnala"; segnala.href = r.segnala; segnala.target = "_blank"; segnala.rel = "noopener";
+            segnala.textContent = "Segnala"; segnala.setAttribute("aria-label", "Segnala questa recensione a Google");
+            cite.appendChild(document.createTextNode(" · ")); cite.appendChild(segnala);
+          }
           scheda.appendChild(stelle); scheda.appendChild(p); scheda.appendChild(cite);
           contenitore.appendChild(scheda);
         });
         if (!CONFIG.googlePlaceId && dati.placeId) impostaLinkGoogle(dati.placeId);
+        if (dati.googleMapsUri) Array.prototype.forEach.call(document.querySelectorAll("[data-link='recensioni']"), function (a) { a.setAttribute("href", dati.googleMapsUri); });
+        document.getElementById("sezione-prova").hidden = false; // prima di misurare la giostra
         giostraCostruisci();
       }
 
@@ -1035,7 +1103,9 @@
         fetch("recensioni.json", { cache: "no-cache" })
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(mostraRecensioni)
-          .catch(function () { /* file assente o non raggiungibile: restano i segnaposto */ });
+          .catch(senzaRecensioni);
+      } else {
+        senzaRecensioni();
       }
     })();
   </script>

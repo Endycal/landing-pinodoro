@@ -13,8 +13,10 @@ const PLACE_ID_PREDEFINITO = 'ChIJcV_Xya3fOhMRWT5u9UL0X08'; // scheda "Ristorant
 const CAMPI = 'id,displayName,rating,userRatingCount,reviews,googleMapsUri';
 const LINGUE = ['it', 'en'];           // Google da' 5 recensioni per lingua: la prima e' la principale (voto, conteggio, testi in italiano),
                                        // le altre aggiungono le recensioni scritte in quella lingua, mostrate nella loro lingua.
-const MEMORIA_GIORNI = 30;             // le recensioni uscite dalle 5 di Google restano visibili fino a 30 giorni dall'ultima volta viste (limite di Google)
-const MASSIMO_TUTTE = 12;              // numero massimo di recensioni conservate nel file
+const MEMORIA_GIORNI = 0;              // nessuna conservazione: il file contiene solo le recensioni che Google fornisce oggi (condizioni di Google)
+const MASSIMO_TUTTE = 10;              // numero massimo di recensioni nel file (5 per lingua)
+const ETA_MASSIMA_GIORNI = 730;        // recensioni piu' vecchie di due anni non entrano (legge 11 marzo 2026, n. 34)
+const TESTO_MIN_FILE = 20;             // recensioni piu' corte non entrano nel file (stessa soglia della giostra in index.html)
 const TESTO_MAX = 320;                 // caratteri mostrati per recensione (oltre: "..." e link "Leggi tutto")
 const TESTO_MIN = 40;                  // recensioni piu' corte non vengono scelte
 const VALUTAZIONE_MIN = 4;             // recensioni con meno stelle non vengono scelte
@@ -138,19 +140,6 @@ function quandoItaliano(string $publishTime, int $adesso): string
 }
 
 // ---------------------------------------------------------------- selezione (identica allo script Node)
-function nomeBreve(?string $nome): string
-{
-    $parti = preg_split('/\s+/u', trim((string) $nome)) ?: [];
-    $parti = array_values(array_filter($parti, static fn(string $p): bool => $p !== ''));
-    if (!$parti) {
-        return 'Cliente Google';
-    }
-    if (count($parti) === 1) {
-        return $parti[0];
-    }
-    return $parti[0] . ' ' . mb_strtoupper(mb_substr($parti[count($parti) - 1], 0, 1)) . '.';
-}
-
 function accorcia(string $testo): array
 {
     if (mb_strlen($testo) <= TESTO_MAX) {
@@ -252,27 +241,36 @@ function normalizza(array $dati, array $extra, string $placeId, ?array $preceden
 {
     $adesso = $adesso ?? time();
     $converti = static function (array $r, string $lingua) use ($dati, $adesso): ?array {
-        $testoIntero = trim((string) preg_replace('/\s+/u', ' ', (string) ($r['text']['text'] ?? ($r['originalText']['text'] ?? ''))));
+        // Attribuzione come la fornisce Google (nome pubblico, link al profilo, link alla recensione, link per segnalare):
+        // le condizioni di Google Maps Platform non permettono di modificarla. Testo originale dell'autore, mai la traduzione.
+        $testoIntero = trim((string) preg_replace('/\s+/u', ' ', (string) ($r['originalText']['text'] ?? ($r['text']['text'] ?? ''))));
         if ($testoIntero === '') {
             return null;
         }
         [$testo, $troncata] = accorcia($testoIntero);
+        $autore = trim((string) ($r['authorAttribution']['displayName'] ?? ''));
         return [
-            'autore' => nomeBreve($r['authorAttribution']['displayName'] ?? null),
+            'autore' => $autore !== '' ? $autore : 'Utente Google',
+            'autoreLink' => (string) ($r['authorAttribution']['uri'] ?? ''),
             'valutazione' => (int) ($r['rating'] ?? 0),
             'testo' => $testo,
             'troncata' => $troncata,
             'testoIntero' => $testoIntero,
             'quando' => quandoItaliano((string) ($r['publishTime'] ?? ''), $adesso),
-            'data' => (string) ($r['publishTime'] ?? ''),
+            'data' => substr((string) ($r['publishTime'] ?? ''), 0, 10),
             'link' => (string) ($r['googleMapsUri'] ?? ($dati['googleMapsUri'] ?? '')),
+            'segnala' => (string) ($r['flagContentUri'] ?? ''),
             'lingua' => $lingua,
         ];
     };
-    // Lingua principale: tutto (i testi sono in italiano, tradotti da Google se serve).
+    // Lingua principale: solo le recensioni scritte davvero in quella lingua (le altre arriverebbero tradotte da Google).
     $scaricate = [];
     $presenti = [];
     foreach ($dati['reviews'] ?? [] as $r) {
+        $linguaOriginale = (string) ($r['originalText']['languageCode'] ?? '');
+        if ($linguaOriginale !== '' && $linguaOriginale !== LINGUE[0]) {
+            continue;
+        }
         $c = $converti($r, LINGUE[0]);
         if ($c) {
             $scaricate[] = $c;
@@ -294,7 +292,18 @@ function normalizza(array $dati, array $extra, string $placeId, ?array $preceden
         }
     }
     $manuali = escluseManuali();
-    $tutte = array_values(array_filter(unisci($scaricate, $precedente, $adesso), static fn(array $r): bool => !daEscludere($r, $manuali)));
+    // Nel file restano solo le recensioni che la pagina puo' mostrare (minimizzazione, art. 5.1.c GDPR).
+    $tutte = array_values(array_filter(unisci($scaricate, $precedente, $adesso), static function (array $r) use ($manuali, $adesso): bool {
+        $testo = (string) ($r['testoIntero'] ?? $r['testo']);
+        if ((int) $r['valutazione'] < VALUTAZIONE_MIN || mb_strlen($testo) < TESTO_MIN_FILE) {
+            return false;
+        }
+        $data = strtotime((string) ($r['data'] ?? ''));
+        if ($data && $adesso - $data > ETA_MASSIMA_GIORNI * 86400) {
+            return false;
+        }
+        return !daEscludere($r, $manuali);
+    }));
     $perScelta = array_map(static function (array $r): array {
         $r['testoIntero'] = $r['testoIntero'] ?? $r['testo'];
         return $r;
@@ -316,7 +325,7 @@ function normalizza(array $dati, array $extra, string $placeId, ?array $preceden
     ];
 }
 
-/** Esclusioni manuali: righe di recensioni-escluse.txt (nome abbreviato come nella pagina, es. "Tania G.", o un pezzo del link). */
+/** Esclusioni manuali: righe di recensioni-escluse.txt (meglio un pezzo del link della recensione; oppure il nome come appare su Google). */
 function escluseManuali(): array
 {
     $file = __DIR__ . '/recensioni-escluse.txt';

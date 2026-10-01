@@ -1,4 +1,5 @@
-# Pubblica la landing su GitHub Pages a ogni push su main.
+# Pubblica la landing su GitHub Pages a ogni push su main: scarica le recensioni dalla scheda Google (se c'e' il secret),
+# prepara la cartella _sito/ con i soli file pubblici e la pubblica. recensioni.json non viene mai salvato nel repository.
 # Prima esecuzione: prova ad attivare Pages da sola (enablement). Se fallisce, attivarlo a mano:
 # Settings > Pages > Source: "GitHub Actions", poi rilanciare il workflow da Actions.
 name: Pubblica su GitHub Pages
@@ -26,14 +27,22 @@ jobs:
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v4
+      - name: Scarica le recensioni dalla scheda Google
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ vars.GOOGLE_PLACE_ID }}
+          GOOGLE_PLACE_QUERY: ${{ vars.GOOGLE_PLACE_QUERY }}
+        run: node scripts/aggiorna-recensioni.mjs
+      - name: Prepara i file da pubblicare
+        run: bash scripts/prepara-sito.sh
       - name: Configura Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Prepara i file da pubblicare
+      - name: Carica i file
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _sito
       - name: Pubblica
         id: deployment
         uses: actions/deploy-pages@v4
@@ -46,6 +55,14 @@ jobs:
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v4
+      - name: Scarica le recensioni dalla scheda Google
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ vars.GOOGLE_PLACE_ID }}
+          GOOGLE_PLACE_QUERY: ${{ vars.GOOGLE_PLACE_QUERY }}
+        run: node scripts/aggiorna-recensioni.mjs
+      - name: Prepara i file da caricare
+        run: bash scripts/prepara-sito.sh --hostinger
       - name: Carica su Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -53,12 +70,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_FTP_USER }}
           password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
           protocol: ${{ vars.HOSTINGER_FTP_PROTOCOL || 'ftps' }}
+          local-dir: _sito/
           server-dir: ${{ vars.HOSTINGER_FTP_DIR || 'public_html/' }}
           exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
-            scripts/**
-            README.md
-            LICENSE
             config.php
