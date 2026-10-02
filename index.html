@@ -337,10 +337,24 @@
       font-family: inherit; font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
     }
     .nota-tasto svg { width: 1rem; height: 1rem; }
-    .nota-tasto:hover, .nota-tasto[aria-expanded="true"] { border-color: var(--oro); }
+    .nota-tasto { transition: border-color .3s ease, background-color .3s ease, box-shadow .3s ease; }
+    .nota-tasto:hover { border-color: var(--oro); }
+    .nota-tasto[aria-expanded="true"] { border-color: var(--oro); background: var(--evidenza); box-shadow: 0 6px 18px rgba(201, 162, 39, .18); }
     .nota-tasto:focus-visible { outline: 2px solid var(--oro-testo); outline-offset: 2px; }
-    .nota-recensioni { flex-basis: 100%; font-size: .76rem; color: var(--inchiostro-tenue); line-height: 1.55; margin: 0; }
-    .nota-recensioni[hidden] { display: none; }
+    .nota-freccia { transform: rotate(90deg); transition: transform .4s cubic-bezier(.2, .7, .3, 1); }
+    .nota-tasto[aria-expanded="true"] .nota-freccia { transform: rotate(-90deg); }
+    /* La nota si apre srotolandosi: la griglia passa da 0fr a 1fr mentre il testo compare in dissolvenza scendendo di poco */
+    .nota-scatola {
+      flex-basis: 100%; display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden;
+      transition: grid-template-rows .45s cubic-bezier(.2, .7, .3, 1), opacity .35s ease, visibility 0s linear .45s;
+    }
+    .nota-scatola.aperta { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s, 0s, 0s; }
+    .nota-interno { overflow: hidden; }
+    .nota-recensioni { font-size: .76rem; color: var(--inchiostro-tenue); line-height: 1.55; margin: 0; padding-top: .2rem; transform: translateY(-6px); transition: transform .45s cubic-bezier(.2, .7, .3, 1); }
+    .nota-scatola.aperta .nota-recensioni { transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .nota-tasto, .nota-freccia, .nota-scatola, .nota-recensioni { transition: none; }
+    }
     .recensione cite a { color: inherit; border-bottom: 1px solid var(--linea); }
     .recensione cite .segnala { font-weight: 500; letter-spacing: .06em; text-transform: none; }
     .nota-recensioni a, .invito a { color: var(--oro-testo); font-weight: 600; border-bottom: 1px solid var(--linea); white-space: nowrap; }
@@ -632,8 +646,8 @@
              Platform, senza modificarlo): metterlo al posto del testo, in versione per sfondo chiaro e scuro. -->
         <div class="recensioni-info" id="recensioni-info">
           <p class="attribuzione-google">Voto e recensioni forniti da Google Maps</p>
-          <button type="button" class="nota-tasto" id="nota-tasto" aria-expanded="false" aria-controls="nota-recensioni"><svg aria-hidden="true"><use href="#i-info"/></svg>Come le scegliamo</button>
-          <p class="nota-recensioni" id="nota-recensioni" hidden>Selezione automatica tra le recensioni che Google fornisce per la scheda <span id="nome-scheda">Google del ristorante</span> (le più pertinenti, in italiano e in inglese): mostriamo solo quelle con almeno 4 stelle, senza espressioni negative e pubblicate da meno di due anni, e togliamo quelle i cui autori chiedono di non comparire. In evidenza prima una recensione sul servizio, una sul viaggio e una sul cibo, poi le altre (prima in italiano, poi per voto e data). Non le verifichiamo noi: autenticità e regole sono di Google. Il voto medio e il numero totale comprendono tutte le recensioni, anche quelle non mostrate. <a href="termini.html#recensioni">Tutti i dettagli nei termini e condizioni</a></p>
+          <button type="button" class="nota-tasto" id="nota-tasto" aria-expanded="false" aria-controls="nota-recensioni"><svg aria-hidden="true"><use href="#i-info"/></svg>Come le scegliamo<svg class="nota-freccia" aria-hidden="true"><use href="#i-freccia"/></svg></button>
+          <div class="nota-scatola" id="nota-recensioni" aria-hidden="true"><div class="nota-interno"><p class="nota-recensioni">Selezione automatica tra le recensioni che Google fornisce per la scheda <span id="nome-scheda">Google del ristorante</span> (le più pertinenti, in italiano e in inglese): mostriamo solo quelle con almeno 4 stelle, senza espressioni negative e pubblicate da meno di due anni, e togliamo quelle i cui autori chiedono di non comparire. In evidenza prima una recensione sul servizio, una sul viaggio e una sul cibo, poi le altre (prima in italiano, poi per voto e data). Non le verifichiamo noi: autenticità e regole sono di Google. Il voto medio e il numero totale comprendono tutte le recensioni, anche quelle non mostrate. <a href="termini.html#recensioni">Tutti i dettagli nei termini e condizioni</a></p></div></div>
         </div>
         <a class="link-oro" data-link="recensioni" href="https://www.google.com/maps/search/?api=1&amp;query=Lido%20Pino%20d%27Oro" target="_blank" rel="noopener">Leggi tutte le recensioni su Google <svg aria-hidden="true"><use href="#i-freccia"/></svg></a>
       </div>
@@ -954,8 +968,10 @@
       var notaTasto = document.getElementById("nota-tasto");
       notaTasto.addEventListener("click", function () {
         var nota = document.getElementById("nota-recensioni");
-        nota.hidden = !nota.hidden;
-        notaTasto.setAttribute("aria-expanded", nota.hidden ? "false" : "true");
+        var aperta = !nota.classList.contains("aperta");
+        nota.classList.toggle("aperta", aperta);
+        nota.setAttribute("aria-hidden", aperta ? "false" : "true");
+        notaTasto.setAttribute("aria-expanded", aperta ? "true" : "false");
       });
       function mostraRecensioni(dati) {
         if (!dati || !dati.scelte || !dati.scelte.length) { senzaRecensioni(); return; }
