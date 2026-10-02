@@ -50,7 +50,7 @@
     [ ] Coperto per i piatti alla carta         -> nota sotto i piatti (segnaposto) e termini.html, punto 3
     [ ] Chiusure: la pagina dice "tutti i giorni dell'anno": confermare che non esistono giorni di riposo o chiusure stagionali
     [ ] 2 piatti "del territorio" con prezzo    -> proposti dal menu stampato (Alici del Tirreno EUR 13,00; Salmone al Falerno EUR 18,00): confermare o sostituire
-    [ ] Orari del pranzo                        -> CONFIG.orarioPranzo
+    [ ] Orari del pranzo e della cena           -> CONFIG.orarioPranzo, CONFIG.orarioCena, CONFIG.giorniCena (venerdì e sabato)
     [ ] Parcheggio e cani                       -> domande frequenti: le due domande sono in un commento HTML, nascoste
                                                    finche' non c'e' la risposta (una domanda con "[da completare]" online non va bene)
     [x] Pagamento con carta                     -> domande frequenti: "Si'" (accettare le carte e' obbligatorio per legge)
@@ -224,6 +224,7 @@
       font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
       line-height: 1.5; padding: calc(.4rem + env(safe-area-inset-top)) 1rem .4rem; white-space: nowrap;
     }
+    @media (max-width: 480px) { .striscia-data { white-space: normal; } }
 
     /* Testata */
     .testata {
@@ -483,7 +484,8 @@
     <symbol id="i-stella" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17l-5.7 3.2 1.2-6.3L2.8 9.5l6.4-.8z" fill="currentColor"/></symbol>
   </svg>
 
-  <!-- Striscia sopra la testata: data di oggi (automatica, fuso Europe/Rome) e fascia oraria del pranzo (fissa, da CONFIG.orarioPranzo: nessun orologio) -->
+  <!-- Striscia sopra la testata: data di oggi (automatica, fuso Europe/Rome) e orari di oggi (fissi, da CONFIG: il pranzo sempre,
+       la cena solo nei giorni di CONFIG.giorniCena; nessun orologio in tempo reale) -->
   <div class="striscia-data"><span id="data-striscia">Oggi</span> · <span data-orario>12:00-15:30</span></div>
 
   <header class="testata">
@@ -504,7 +506,7 @@
           <figcaption>Il tavolo sulla spiaggia</figcaption>
         </figure>
         <div>
-          <p class="oggi"><span>Oggi<span id="data-oggi"></span>, siamo aperti a pranzo · <span data-orario>12:00-15:30</span></span></p>
+          <p class="oggi"><span>Oggi<span id="data-oggi"></span>, siamo aperti <span data-pasti>a pranzo</span> · <span data-orario>12:00-15:30</span></span></p>
           <h1 id="titolo">Pranzo sulla spiaggia, a 1 minuto dalla Domiziana. Aperti anche oggi.</h1>
           <p class="sottotitolo">Pesce del nostro Tirreno, prezzi chiari, un servizio che rispetta i tuoi tempi. Tutti i giorni dell'anno, anche d'inverno.</p>
           <ul class="certezze" aria-label="Quattro certezze">
@@ -626,7 +628,7 @@
         <span class="occhiello">Domande frequenti</span>
         <h2 class="titolo-sezione" id="titolo-domande">Prima di metterti in strada</h2>
         <dl class="domande">
-          <div><dt>Siete aperti oggi?</dt><dd>Sì. A pranzo tutti i giorni dell'anno, Natale e Ferragosto compresi, salvo chiusure straordinarie per maltempo o eventi: in caso di dubbio chiama, o guarda gli orari sulla scheda Google.</dd></div>
+          <div><dt>Siete aperti oggi?</dt><dd>Sì. A pranzo tutti i giorni dell'anno, Natale e Ferragosto compresi; il venerdì e il sabato anche a cena, 19:30-22:30. Salvo chiusure straordinarie per maltempo o eventi: in caso di dubbio chiama, o guarda gli orari sulla scheda Google.</dd></div>
           <!-- Quando si conosce la svolta, aggiungerla qui: "300 metri, un minuto di macchina: svolta all'altezza di ..." -->
           <div><dt>Quanto siete lontani dalla Domiziana?</dt><dd>300 metri, un minuto di macchina dalla via Domiziana.</dd></div>
           <div><dt>Quanto ci vuole a pranzo?</dt><dd>Un'ora con calma, 30 minuti con il menù Smart.</dd></div>
@@ -706,6 +708,9 @@
         whatsapp: "393887877008",
         // Orario del pranzo mostrato nella riga sopra il titolo. DA CONFERMARE.
         orarioPranzo: "12:00-15:30",
+        // Cena: solo nei giorni elencati (0 = domenica, 1 = lunedì, ..., 5 = venerdì, 6 = sabato). Con [] la cena non compare mai.
+        orarioCena: "19:30-22:30",
+        giorniCena: [5, 6],
         // Place ID della scheda Google del Lido (Google Maps > scheda del Lido > condividi, oppure
         // https://developers.google.com/maps/documentation/places/web-service/place-id).
         // Con il Place ID, "Portami li'" apre direttamente la scheda e "Leggi tutte le recensioni" apre le recensioni.
@@ -760,18 +765,36 @@
           return GIORNI[adesso.getDay()] + " " + adesso.getDate() + " " + MESI[adesso.getMonth()] + (conAnno ? " " + adesso.getFullYear() : "");
         }
       }
+      // Giorno della settimana nel fuso di Roma (0 = domenica ... 6 = sabato): decide se oggi c'e' anche la cena.
+      function giornoRoma(adesso) {
+        try {
+          var g = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "Europe/Rome" }).format(adesso);
+          var i = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(g);
+          if (i >= 0) return i;
+        } catch (e) {}
+        return adesso.getDay();
+      }
+      function cenaOggi(adesso) {
+        return !!(CONFIG.orarioCena && (CONFIG.giorniCena || []).indexOf(giornoRoma(adesso)) >= 0);
+      }
       var ultimaData = "";
       function aggiornaData() {
+        var adesso = new Date();
         var breve = dataOggi(false);
-        if (breve === ultimaData) return;
-        ultimaData = breve;
+        var cena = cenaOggi(adesso);
+        var chiave = breve + (cena ? " | cena" : "");
+        if (chiave === ultimaData) return;
+        ultimaData = chiave;
         document.getElementById("data-oggi").textContent = ", " + breve;
         var completa = dataOggi(true);
         document.getElementById("data-striscia").textContent = completa.charAt(0).toUpperCase() + completa.slice(1);
+        // Orari di oggi: il pranzo sempre; nei giorni di CONFIG.giorniCena anche la cena
+        var orari = CONFIG.orarioPranzo + (cena ? " e " + CONFIG.orarioCena : "");
+        Array.prototype.forEach.call(document.querySelectorAll("[data-orario]"), function (el) { el.textContent = orari; });
+        Array.prototype.forEach.call(document.querySelectorAll("[data-pasti]"), function (el) { el.textContent = cena ? "a pranzo e a cena" : "a pranzo"; });
       }
       aggiornaData();
       setInterval(aggiornaData, 60000);
-      Array.prototype.forEach.call(document.querySelectorAll("[data-orario]"), function (el) { el.textContent = CONFIG.orarioPranzo; });
 
       // Link dei pulsanti, costruiti da CONFIG.
       var cifre = String(CONFIG.whatsapp).replace(/\D/g, "");
