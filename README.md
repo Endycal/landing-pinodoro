@@ -56,7 +56,7 @@ PULSANTI
 COSA COMPLETARE PRIMA DI ANDARE ONLINE
   Apri index.html con un editor di testo.
   1. In cima al file: l'elenco dei dati da completare, con la posizione di ciascuno.
-  2. In fondo al file, blocco CONFIG: orari di pranzo e cena con i giorni della cena, Place ID della scheda Google,
+  2. In fondo al file, blocco CONFIG: orari di apertura per giorno della settimana (CONFIG.orari), Place ID della scheda Google,
      ID Google Ads ed etichette di conversione.
   3. Nel testo, i dati mancanti sono tra parentesi quadre dentro <span class="dc">...</span>
      (in giallo oro sulla pagina): sostituisci il testo e togli lo span.

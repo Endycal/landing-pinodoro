@@ -50,7 +50,7 @@
     [ ] Coperto per i piatti alla carta         -> nota sotto i piatti (segnaposto) e termini.html, punto 3
     [ ] Chiusure: la pagina dice "tutti i giorni dell'anno": confermare che non esistono giorni di riposo o chiusure stagionali
     [ ] 2 piatti "del territorio" con prezzo    -> proposti dal menu stampato (Alici del Tirreno EUR 13,00; Salmone al Falerno EUR 18,00): confermare o sostituire
-    [ ] Orari del pranzo e della cena           -> CONFIG.orarioPranzo, CONFIG.orarioCena, CONFIG.giorniCena (venerdì e sabato)
+    [x] Orari di apertura per giorno            -> CONFIG.orari (lun-gio 12-15; ven 12-15 e 19:30-23; sab 12-15 e 19:30-23:30; dom 12-15:30)
     [ ] Parcheggio e cani                       -> domande frequenti: le due domande sono in un commento HTML, nascoste
                                                    finche' non c'e' la risposta (una domanda con "[da completare]" online non va bene)
     [x] Pagamento con carta                     -> domande frequenti: "Si'" (accettare le carte e' obbligatorio per legge)
@@ -485,9 +485,9 @@
     <symbol id="i-stella" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17l-5.7 3.2 1.2-6.3L2.8 9.5l6.4-.8z" fill="currentColor"/></symbol>
   </svg>
 
-  <!-- Striscia sopra la testata: data di oggi (automatica, fuso Europe/Rome) e orari di oggi (fissi, da CONFIG: il pranzo sempre,
-       la cena solo nei giorni di CONFIG.giorniCena; nessun orologio in tempo reale) -->
-  <div class="striscia-data"><span id="data-striscia">Oggi</span> · <span data-orario>12:00-15:30</span></div>
+  <!-- Striscia sopra la testata: data di oggi (automatica, fuso Europe/Rome) e orari del giorno (fissi, da CONFIG.orari per giorno
+       della settimana; nessun orologio in tempo reale) -->
+  <div class="striscia-data"><span id="data-striscia">Oggi</span> · <span data-orario>12:00-15:00</span></div>
 
   <header class="testata">
     <div class="logo">
@@ -507,7 +507,7 @@
           <figcaption>Il tavolo sulla spiaggia</figcaption>
         </figure>
         <div>
-          <p class="oggi"><span>Oggi<span id="data-oggi"></span>, siamo aperti <span data-pasti>a pranzo</span> · <span data-orario>12:00-15:30</span></span></p>
+          <p class="oggi"><span>Oggi<span id="data-oggi"></span>, siamo aperti <span data-pasti>a pranzo</span> · <span data-orario>12:00-15:00</span></span></p>
           <h1 id="titolo">Pranzo sulla spiaggia, a 1 minuto dalla Domiziana. Aperti anche oggi.</h1>
           <p class="sottotitolo">Pesce del nostro Tirreno, prezzi chiari, un servizio che rispetta i tuoi tempi. Tutti i giorni dell'anno, anche d'inverno.</p>
           <ul class="certezze" aria-label="Quattro certezze">
@@ -629,7 +629,7 @@
         <span class="occhiello">Domande frequenti</span>
         <h2 class="titolo-sezione" id="titolo-domande">Prima di metterti in strada</h2>
         <dl class="domande">
-          <div><dt>Siete aperti oggi?</dt><dd>Sì. A pranzo tutti i giorni dell'anno, Natale e Ferragosto compresi; il venerdì e il sabato anche a cena, 19:30-22:30. Salvo chiusure straordinarie per maltempo o eventi: in caso di dubbio chiama, o guarda gli orari sulla scheda Google.</dd></div>
+          <div><dt>Siete aperti oggi?</dt><dd>Sì. A pranzo tutti i giorni dell'anno, Natale e Ferragosto compresi: 12:00-15:00, la domenica fino alle 15:30. A cena il venerdì (19:30-23:00) e il sabato (19:30-23:30). Salvo chiusure straordinarie per maltempo o eventi: in caso di dubbio chiama, o guarda gli orari sulla scheda Google.</dd></div>
           <!-- Quando si conosce la svolta, aggiungerla qui: "300 metri, un minuto di macchina: svolta all'altezza di ..." -->
           <div><dt>Quanto siete lontani dalla Domiziana?</dt><dd>300 metri, un minuto di macchina dalla via Domiziana.</dd></div>
           <div><dt>Quanto ci vuole a pranzo?</dt><dd>Un'ora con calma, 30 minuti con il menù Smart.</dd></div>
@@ -707,11 +707,15 @@
         telefono: "+39 388 787 7008",
         // Numero WhatsApp (lo stesso numero): solo cifre, con il prefisso 39 e senza "+".
         whatsapp: "393887877008",
-        // Orario del pranzo mostrato nella riga sopra il titolo. DA CONFERMARE.
-        orarioPranzo: "12:00-15:30",
-        // Cena: solo nei giorni elencati (0 = domenica, 1 = lunedì, ..., 5 = venerdì, 6 = sabato). Con [] la cena non compare mai.
-        orarioCena: "19:30-22:30",
-        giorniCena: [5, 6],
+        // Orari mostrati nella striscia in alto e nella riga sopra il titolo, per giorno (vedi sotto).
+        // Orari di apertura per giorno della settimana (0 = domenica, 1 = lunedì, ..., 6 = sabato): una o piu' fasce al giorno.
+        // La pagina mostra le fasce del giorno corrente (fuso di Roma). Ogni giorno deve avere almeno una fascia.
+        orari: {
+          1: ["12:00-15:00"], 2: ["12:00-15:00"], 3: ["12:00-15:00"], 4: ["12:00-15:00"],
+          5: ["12:00-15:00", "19:30-23:00"],
+          6: ["12:00-15:00", "19:30-23:30"],
+          0: ["12:00-15:30"]
+        },
         // Place ID della scheda Google del Lido (Google Maps > scheda del Lido > condividi, oppure
         // https://developers.google.com/maps/documentation/places/web-service/place-id).
         // Con il Place ID, "Portami li'" apre direttamente la scheda e "Leggi tutte le recensioni" apre le recensioni.
@@ -775,24 +779,24 @@
         } catch (e) {}
         return adesso.getDay();
       }
-      function cenaOggi(adesso) {
-        return !!(CONFIG.orarioCena && (CONFIG.giorniCena || []).indexOf(giornoRoma(adesso)) >= 0);
+      function fasceDiOggi(adesso) {
+        var fasce = CONFIG.orari && CONFIG.orari[giornoRoma(adesso)];
+        return Array.isArray(fasce) ? fasce : [];
       }
       var ultimaData = "";
       function aggiornaData() {
         var adesso = new Date();
         var breve = dataOggi(false);
-        var cena = cenaOggi(adesso);
-        var chiave = breve + (cena ? " | cena" : "");
+        var fasce = fasceDiOggi(adesso);
+        var chiave = breve + " | " + fasce.join(",");
         if (chiave === ultimaData) return;
         ultimaData = chiave;
         document.getElementById("data-oggi").textContent = ", " + breve;
         var completa = dataOggi(true);
         document.getElementById("data-striscia").textContent = completa.charAt(0).toUpperCase() + completa.slice(1);
-        // Orari di oggi: il pranzo sempre; nei giorni di CONFIG.giorniCena anche la cena
-        var orari = CONFIG.orarioPranzo + (cena ? " e " + CONFIG.orarioCena : "");
-        Array.prototype.forEach.call(document.querySelectorAll("[data-orario]"), function (el) { el.textContent = orari; });
-        Array.prototype.forEach.call(document.querySelectorAll("[data-pasti]"), function (el) { el.textContent = cena ? "a pranzo e a cena" : "a pranzo"; });
+        // Orari di oggi, dalle fasce del giorno in CONFIG.orari: una fascia = pranzo, due fasce = pranzo e cena
+        Array.prototype.forEach.call(document.querySelectorAll("[data-orario]"), function (el) { el.textContent = fasce.join(" e "); });
+        Array.prototype.forEach.call(document.querySelectorAll("[data-pasti]"), function (el) { el.textContent = fasce.length > 1 ? "a pranzo e a cena" : "a pranzo"; });
       }
       aggiornaData();
       setInterval(aggiornaData, 60000);
