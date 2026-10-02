@@ -328,8 +328,19 @@
     [data-g="sosta"] .scheda-sosta { order: -1; }
 
     .nota-prezzi { font-size: .76rem; color: var(--inchiostro-tenue); margin-top: .15rem; line-height: 1.5; }
-    .attribuzione-google { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--inchiostro-tenue); margin-top: .9rem; }
-    .nota-recensioni { font-size: .76rem; color: var(--inchiostro-tenue); line-height: 1.55; margin-top: .5rem; }
+    .recensioni-info { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem .9rem; margin-top: .9rem; }
+    .recensioni-info[hidden] { display: none; }
+    .attribuzione-google { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--inchiostro-tenue); }
+    .nota-tasto {
+      display: inline-flex; align-items: center; gap: .4rem; min-height: 2.1rem; padding: .35rem .8rem; border-radius: 999px;
+      border: 1px solid var(--linea); background: var(--superficie); color: var(--oro-testo); cursor: pointer;
+      font-family: inherit; font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    }
+    .nota-tasto svg { width: 1rem; height: 1rem; }
+    .nota-tasto:hover, .nota-tasto[aria-expanded="true"] { border-color: var(--oro); }
+    .nota-tasto:focus-visible { outline: 2px solid var(--oro-testo); outline-offset: 2px; }
+    .nota-recensioni { flex-basis: 100%; font-size: .76rem; color: var(--inchiostro-tenue); line-height: 1.55; margin: 0; }
+    .nota-recensioni[hidden] { display: none; }
     .recensione cite a { color: inherit; border-bottom: 1px solid var(--linea); }
     .recensione cite .segnala { font-weight: 500; letter-spacing: .06em; text-transform: none; }
     .nota-recensioni a, .invito a { color: var(--oro-testo); font-weight: 600; border-bottom: 1px solid var(--linea); white-space: nowrap; }
@@ -482,6 +493,7 @@
     <symbol id="i-riprendi" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></symbol>
     <symbol id="i-sole" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-luna" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.5M12 7.6v.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-stella" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17l-5.7 3.2 1.2-6.3L2.8 9.5l6.4-.8z" fill="currentColor"/></symbol>
   </svg>
 
@@ -614,9 +626,15 @@
         <!-- Attribuzione richiesta dalle condizioni di Google Maps Platform quando i dati Places sono mostrati senza mappa.
              Google chiede il logo "Google Maps" (da scaricare dalla pagina delle linee guida di attribuzione di Google Maps
              Platform, senza modificarlo): metterlo qui al posto del testo, in versione per sfondo chiaro e scuro. -->
-        <p class="attribuzione-google">Voto e recensioni forniti da Google Maps</p>
-        <!-- Avviso richiesto dal Codice del consumo (art. 22, comma 5-bis) e dalla legge 34/2026: come scegliamo e ordiniamo le recensioni -->
-        <p class="nota-recensioni" id="nota-recensioni">Selezione automatica tra le recensioni che Google fornisce per la scheda <span id="nome-scheda">Google del ristorante</span> (le più pertinenti, in italiano e in inglese): mostriamo solo quelle con almeno 4 stelle, senza espressioni negative e pubblicate da meno di due anni, e togliamo quelle i cui autori chiedono di non comparire. In evidenza prima una recensione sul servizio, una sul viaggio e una sul cibo, poi le altre (prima in italiano, poi per voto e data). Non le verifichiamo noi: autenticità e regole sono di Google. Il voto medio e il numero totale comprendono tutte le recensioni, anche quelle non mostrate. <a href="termini.html#recensioni">Come le scegliamo</a></p>
+        <!-- Attribuzione richiesta dalle condizioni di Google Maps Platform (sempre visibile) e tastino che apre l'avviso richiesto
+             dal Codice del consumo (art. 22, comma 5-bis) e dalla legge 34/2026 su come scegliamo e ordiniamo le recensioni.
+             Google chiede il logo "Google Maps" (da scaricare dalla pagina delle linee guida di attribuzione di Google Maps
+             Platform, senza modificarlo): metterlo al posto del testo, in versione per sfondo chiaro e scuro. -->
+        <div class="recensioni-info" id="recensioni-info">
+          <p class="attribuzione-google">Voto e recensioni forniti da Google Maps</p>
+          <button type="button" class="nota-tasto" id="nota-tasto" aria-expanded="false" aria-controls="nota-recensioni"><svg aria-hidden="true"><use href="#i-info"/></svg>Come le scegliamo</button>
+          <p class="nota-recensioni" id="nota-recensioni" hidden>Selezione automatica tra le recensioni che Google fornisce per la scheda <span id="nome-scheda">Google del ristorante</span> (le più pertinenti, in italiano e in inglese): mostriamo solo quelle con almeno 4 stelle, senza espressioni negative e pubblicate da meno di due anni, e togliamo quelle i cui autori chiedono di non comparire. In evidenza prima una recensione sul servizio, una sul viaggio e una sul cibo, poi le altre (prima in italiano, poi per voto e data). Non le verifichiamo noi: autenticità e regole sono di Google. Il voto medio e il numero totale comprendono tutte le recensioni, anche quelle non mostrate. <a href="termini.html#recensioni">Tutti i dettagli nei termini e condizioni</a></p>
+        </div>
         <a class="link-oro" data-link="recensioni" href="https://www.google.com/maps/search/?api=1&amp;query=Lido%20Pino%20d%27Oro" target="_blank" rel="noopener">Leggi tutte le recensioni su Google <svg aria-hidden="true"><use href="#i-freccia"/></svg></a>
       </div>
     </section>
@@ -929,9 +947,16 @@
       // mai recensioni segnaposto o stelle non vere.
       function senzaRecensioni() {
         document.getElementById("recensioni-giostra").hidden = true;
-        document.getElementById("nota-recensioni").hidden = true;
+        document.getElementById("recensioni-info").hidden = true;
         document.getElementById("sezione-prova").hidden = false;
       }
+      // Tastino "Come le scegliamo": apre e chiude l'avviso su selezione e ordinamento delle recensioni
+      var notaTasto = document.getElementById("nota-tasto");
+      notaTasto.addEventListener("click", function () {
+        var nota = document.getElementById("nota-recensioni");
+        nota.hidden = !nota.hidden;
+        notaTasto.setAttribute("aria-expanded", nota.hidden ? "false" : "true");
+      });
       function mostraRecensioni(dati) {
         if (!dati || !dati.scelte || !dati.scelte.length) { senzaRecensioni(); return; }
         if (typeof dati.valutazione === "number" && dati.numeroRecensioni) {
