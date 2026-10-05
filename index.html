@@ -42,14 +42,13 @@
        Se un file manca, al suo posto compare una cornice dorata con la didascalia.
 
     DATI DA COMPLETARE PRIMA DELLA PUBBLICAZIONE
-    [ ] Contenuto e prezzo del menu Smart        -> precompilato dal menu stampato (EUR 16,70): confermare
-    [ ] Contenuto e prezzo del menu Plus         -> precompilato dal menu stampato (EUR 25,70): confermare
+    [x] Contenuto e prezzo dei menu Smart (16,70) e Plus (25,70) -> dal menu in PDF del 5 ottobre 2026
     [ ] Tempi di servizio: oggi sono un impegno ("ti serviamo in 30 minuti"), non una garanzia. Per scrivere "garantito"
         servono condizioni e rimedio, da mettere sia nella scheda "pausa pranzo" sia in termini.html (punto 4)
-    [ ] Giorni di validita' del menu PLUS       -> scheda "pausa pranzo" (segnaposto) e termini.html, punto 3
-    [ ] Coperto per i piatti alla carta         -> nota sotto i piatti (segnaposto) e termini.html, punto 3
+    [x] Giorni dei menu Smart e Plus            -> dal lunedì al venerdì esclusi festivi (menu PDF)
+    [x] Pane, coperto e servizio alla carta     -> EUR 2,00 a persona (menu PDF), nota sotto i piatti e termini.html, punto 3
     [ ] Chiusure: la pagina dice "tutti i giorni dell'anno": confermare che non esistono giorni di riposo o chiusure stagionali
-    [ ] 2 piatti "del territorio" con prezzo    -> proposti dal menu stampato (Alici del Tirreno EUR 13,00; Salmone al Falerno EUR 18,00): confermare o sostituire
+    [x] 2 piatti "del territorio" con prezzo    -> Frittura di Alici locali EUR 13,00 e Salmone al Falerno EUR 18,00 (menu PDF)
     [x] Orari di apertura per giorno            -> CONFIG.orari (lun-gio 12-15; ven 12-15 e 19:30-23; sab 12-15 e 19:30-23:30; dom 12-15:30)
     [ ] Parcheggio e cani                       -> domande frequenti: le due domande sono in un commento HTML, nascoste
                                                    finche' non c'e' la risposta (una domanda con "[da completare]" online non va bene)
@@ -560,8 +559,10 @@
             fino a 4 persone con ordine entro le 14:00 (<a href="termini.html#tempi">condizioni</a>)."
             Una garanzia pubblicata senza condizioni e' un'omissione ingannevole (art. 22 Codice del consumo).
           -->
-          <p><strong class="etichetta">SMART, € 16,70</strong>: un piatto a scelta tra sei, con acqua, caffè, pane e coperto, dal lunedì al venerdì esclusi festivi. Dillo al cameriere quando ti siedi: ti serviamo in 30 minuti.</p>
-          <p><strong class="etichetta">PLUS, € 25,70</strong>: un primo e un secondo a scelta, con acqua, caffè, pane e coperto, <span class="dc">[tutti i giorni / dal lunedì al venerdì esclusi festivi]</span>. Servito in 45 minuti.</p>
+          <!-- Prezzi e contenuti dal menu in PDF del 5 ottobre 2026: SMART un piatto tra cinque, PLUS un primo tra quattro e un
+               secondo tra tre; entrambi dal lunedì al venerdì esclusi festivi; acqua, caffè, servizio, pane e coperto inclusi. -->
+          <p><strong class="etichetta">SMART, € 16,70</strong>: un piatto a scelta tra cinque, con acqua, caffè, servizio, pane e coperto, dal lunedì al venerdì esclusi festivi. Dillo al cameriere quando ti siedi: ti serviamo in 30 minuti.</p>
+          <p><strong class="etichetta">PLUS, € 25,70</strong>: un primo a scelta tra quattro e un secondo tra tre, con acqua, caffè, servizio, pane e coperto, dal lunedì al venerdì esclusi festivi. Servito in 45 minuti.</p>
           <p>Fattura al tavolo, subito.<br><strong>Porti un cliente?</strong> Ti riserviamo un tavolo tranquillo sulla spiaggia, dove si parla.</p>
           <a class="btn btn-scuro btn-largo" data-azione="whatsapp-lavoro" href="https://wa.me/393887877008?text=DOMIZIANA%20LAVORO%20%E2%80%93%20arrivo%20tra%2010%20minuti%2C%20siamo%20in%20%5B%20%5D" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp: arrivo per pranzo</a>
         </article>
@@ -570,13 +571,13 @@
           <div class="icona" aria-hidden="true"><svg><use href="#i-auto"/></svg></div>
           <h2>Sei in viaggio?</h2>
           <p><strong>Se passi di qui una volta sola, ordina questi:</strong></p>
-          <!-- I due piatti sotto lo Spaghetto sono proposti dal menu stampato: confermare o sostituire (nomi sul menu: "Alici zona FAO 37.1.3", "Salmone al Falerno") -->
+          <!-- Piatti e prezzi dal menu in PDF del 5 ottobre 2026 (Spaghetti ai Lupini locali 16,50; Frittura di Alici locali 13,00; Salmone al Falerno 18,00) -->
           <ul class="piatti">
-            <li><span>Spaghetto ai Lupini del nostro Tirreno</span><span>€ 16,50</span></li>
-            <li><span class="dc">Alici del nostro Tirreno</span><span class="dc">€ 13,00</span></li>
-            <li><span class="dc">Salmone in crosta al Falerno del Massico</span><span class="dc">€ 18,00</span></li>
+            <li><span>Spaghetti ai Lupini del nostro Tirreno</span><span>€ 16,50</span></li>
+            <li><span>Frittura di Alici del nostro Tirreno</span><span>€ 13,00</span></li>
+            <li><span>Salmone in crosta al Falerno del Massico</span><span>€ 18,00</span></li>
           </ul>
-          <p class="nota-prezzi">Prezzi IVA inclusa. Coperto: <span class="dc">[€ x,xx a persona, oppure: incluso]</span>; nei menu SMART e PLUS è già compreso.</p>
+          <p class="nota-prezzi">Prezzi IVA inclusa. Pane, coperto e servizio: € 2,00 a persona; nei menu SMART e PLUS sono già compresi.</p>
           <p><strong>Con i bambini?</strong> C'è il menù baby, e mentre aspettate possono sgranchirsi le gambe in spiaggia.</p>
           <a class="btn btn-scuro btn-largo" data-azione="whatsapp-sosta" href="https://wa.me/393887877008?text=DOMIZIANA%20SOSTA%20%E2%80%93%20arriviamo%20tra%2010%20minuti%2C%20siamo%20in%20%5B%20%5D%20(bambini%3A%20%5B%20%5D)" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp: siamo in viaggio, arriviamo</a>
         </article>

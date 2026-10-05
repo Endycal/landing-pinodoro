@@ -214,7 +214,6 @@ NOTE LEGALI, PRIVACY E COOKIE
       cancellare la riga. Facoltativo: estremi SCIA e concessione demaniale -> termini.html punto 2;
     - dominio della copia su Hostinger, paese del data center (hPanel) e giorni di conservazione dei log di
       accesso -> privacy.html, punti 2.a e 3; su Hostinger accettare il DPA nell'area clienti;
-    - giorni di validita' del menu PLUS e coperto dei piatti alla carta -> landing e termini.html punto 3;
     - dominio e cookie policy del sito principale -> cookie.html punto 2 (solo se la landing sta nel sito WordPress);
     - tempi di servizio: oggi "ti serviamo in 30 minuti" e' un impegno; per scrivere "garantito" servono
       condizioni e rimedio, sia nella landing sia in termini.html punto 4 (vedi commento in index.html);
