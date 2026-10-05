@@ -3,26 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Cookie policy | Lido Pino d'Oro</title>
-  <meta name="description" content="Cookie e tecnologie simili usati dalla pagina Pranzo sulla Domiziana del Lido Pino d'Oro.">
+  <title>Cookie policy | {{nome}}</title>
+  <meta name="description" content="Cookie e tecnologie simili usati dalla pagina Pranzo sulla Domiziana del {{nome}}.">
   <meta name="robots" content="noindex, follow">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <script>(function () { try { var t = localStorage.getItem("tema"); if (t === "scuro" || t === "chiaro") document.documentElement.setAttribute("data-tema", t); } catch (e) {} })();</script>
-  <link rel="stylesheet" href="legale.css">
+  <script>
+    (function () {
+      var scelta = null;
+      try { scelta = localStorage.getItem("tema"); } catch (errore) { scelta = null; }
+      if (scelta === "scuro" || scelta === "chiaro") document.documentElement.dataset.tema = scelta;
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/legale.css">
 </head>
 <body>
+  <a class="salta" href="#contenuto">Salta al contenuto</a>
   <header class="testata">
     <a href="./" class="logo" aria-label="Torna alla pagina Pranzo sulla Domiziana">
-      <img class="logo-chiaro" src="logo.png" alt="Lido Pino d'Oro, ristorante sulla spiaggia" width="92" height="60">
-      <img class="logo-scuro" src="logo-scuro.png" alt="" width="92" height="60">
+      <img class="logo-chiaro" src="assets/loghi/logo.webp" alt="{{nome}}, ristorante sulla spiaggia" width="92" height="60">
+      <img class="logo-scuro" src="assets/loghi/logo-scuro.webp" alt="" width="92" height="60">
     </a>
   </header>
 
-  <main class="contenitore legale">
+  <main class="contenitore legale" id="contenuto" tabindex="-1">
     <span class="occhiello">Note legali</span>
     <h1>Cookie policy</h1>
     <p class="aggiornato">Informativa sui cookie e sulle tecnologie simili, secondo le Linee guida del Garante per la protezione dei dati personali del 10 giugno 2021 · Ultimo aggiornamento: 1 ottobre 2026</p>
@@ -74,14 +81,14 @@
       </tbody>
     </table>
     <p>I cookie e le memorie di Google Ads vengono installati solo se la misurazione delle campagne è attiva e solo dopo che hai scelto "Accetta" nel banner. Se la misurazione non è attiva, il banner non compare e non viene installato alcun cookie. Non usiamo cookie di analisi statistica né altri cookie di terze parti. L'elenco completo dei cookie che Google può usare è nella pagina <a href="https://policies.google.com/technologies/cookies?hl=it" rel="noopener" target="_blank">Tipi di cookie utilizzati da Google</a>.</p>
-    <p>Se stai visitando questa pagina all'interno del sito <span class="dc">[dominio del sito principale]</span>, nel tuo browser possono essere presenti anche i cookie impostati dalle altre pagine di quel sito, descritti nella sua cookie policy: <span class="dc">[collegamento alla cookie policy del sito principale]</span>. Questa pagina non li legge e non ne installa altri.</p>
+    <p>Se stai visitando questa pagina all'interno del sito {{{sitoPrincipale.dominio}}}, nel tuo browser possono essere presenti anche i cookie impostati dalle altre pagine di quel sito, descritti nella sua cookie policy: {{{sitoPrincipale.cookiePolicy}}}. Questa pagina non li legge e non ne installa altri.</p>
 
     <h2>3. Il banner e le tue scelte</h2>
     <ul>
       <li>Alla prima visita, se la misurazione Google Ads è attiva, compare un banner con due pulsanti identici per dimensioni, colori e caratteri: "Accetta" e "Rifiuta", più la X in alto a destra. Finché non scegli, nessun cookie di marketing viene installato. Chiudere il banner con la X significa restare con le impostazioni predefinite, cioè senza cookie di marketing: equivale a rifiutare.</li>
       <li>La scelta viene ricordata per 6 mesi nella memoria locale del browser; poi viene cancellata e il banner viene riproposto.</li>
       <li>Puoi cambiare idea in qualsiasi momento dal collegamento "Preferenze cookie" in fondo alla pagina, che riapre il banner. Se revochi il consenso, la pagina cancella i cookie e le memorie di Google Ads impostati su questo dominio e si ricarica senza il tag di Google; i cookie sul dominio doubleclick.net puoi eliminarli dalle impostazioni del browser.</li>
-      <li>Il consenso viene comunicato a Google con la modalità consenso (Consent Mode): senza consenso il tag non viene caricato; con il consenso autorizziamo solo la misurazione degli annunci, non la loro personalizzazione.</li>
+      <li>Il consenso viene comunicato a Google con la modalità consenso (Consent Mode): il tag parte con ogni finalità negata e non viene caricato senza consenso; con il consenso autorizziamo solo la misurazione degli annunci, non la loro personalizzazione.</li>
     </ul>
 
     <h2>4. Gestire i cookie dal browser</h2>
@@ -94,7 +101,7 @@
     </ul>
 
     <h2>6. Titolare e aggiornamenti</h2>
-    <p>Il titolare del trattamento è il Lido Pino d'Oro, i cui dati completi sono nell'<a href="privacy.html">Informativa sulla privacy</a>. Questa cookie policy può essere aggiornata se cambiano gli strumenti usati dalla pagina: la versione in vigore è quella pubblicata qui.</p>
+    <p>Il titolare del trattamento è il {{nome}}, i cui dati completi sono nell'<a href="privacy.html">Informativa sulla privacy</a>. Questa cookie policy può essere aggiornata se cambiano gli strumenti usati dalla pagina: la versione in vigore è quella pubblicata qui.</p>
 
     <nav class="legale-nav" aria-label="Note legali">
       <a href="termini.html">Termini e condizioni</a>
@@ -104,7 +111,7 @@
   </main>
 
   <footer class="pie">
-    <p>© 2026 Lido Pino d'Oro · Mondragone (CE)</p>
+    <p>© {{anno}} {{nome}} · {{indirizzo.comune}} ({{indirizzo.provincia}})</p>
   </footer>
 </body>
 </html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pranzo sulla Domiziana | {{nome}}</title>
+  <meta name="description" content="Pranzo sulla spiaggia a {{indirizzo.comune}}, a {{indirizzo.distanza}} dalla via Domiziana. Menu {{menu.smart.nome}} a {{menu.smart.prezzo}} servito in {{menu.smart.minuti}} minuti, pesce del Tirreno alla carta. Aperti a pranzo tutti i giorni.">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)">
+  <script>
+    (function () {
+      var scelta = null;
+      try { scelta = localStorage.getItem("tema"); } catch (errore) { scelta = null; }
+      if (scelta === "scuro" || scelta === "chiaro") document.documentElement.dataset.tema = scelta;
+      var gruppo = new URLSearchParams(location.search).get("g");
+      if (gruppo === "lavoro" || gruppo === "sosta") document.documentElement.dataset.g = gruppo;
+    })();
+  </script>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="preload" href="assets/caratteri/montserrat.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/caratteri/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/stile.css">
+  <script type="application/ld+json">{{{jsonLd}}}</script>
+</head>
+<body>
+  <a class="salta" href="#contenuto">Salta al contenuto</a>
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-spunta" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-valigetta" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12h18" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-auto" viewBox="0 0 24 24"><path d="M4 16v-4.5L6.2 6.8A1.5 1.5 0 0 1 7.6 6h8.8a1.5 1.5 0 0 1 1.4.8L20 11.5V16M4 11.5h16M4 16H3a1 1 0 0 1-1-1v-2.5M20 16h1a1 1 0 0 0 1-1v-2.5M6 16v2M18 16v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.5" cy="13.5" r="1" fill="currentColor"/><circle cx="16.5" cy="13.5" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-freccia" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.5s7-6.4 7-11.5a7 7 0 1 0-14 0c0 5.1 7 11.5 7 11.5z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-telefono" viewBox="0 0 24 24"><path d="M6.6 3.5h3l1.6 4-2 1.3a11 11 0 0 0 6 6l1.3-2 4 1.6v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.9L3.5 20.5l4.2-1.1A8.5 8.5 0 1 0 12 3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.3 8.6c.2-.4.5-.4.7-.4h.5c.2 0 .4 0 .5.4l.7 1.6c.1.2 0 .4-.1.5l-.5.6c-.1.1-.1.3 0 .4a6 6 0 0 0 2.8 2.7c.2.1.3 0 .4-.1l.6-.7c.1-.2.3-.2.5-.1l1.6.7c.2.1.3.3.3.5 0 .8-.6 1.6-1.4 1.8-.7.2-1.5.1-2.6-.5a9.7 9.7 0 0 1-3.9-3.9c-.5-1-.7-1.9-.5-2.6.1-.4.2-.7.4-.9z" fill="currentColor"/></symbol>
+    <symbol id="i-pausa" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-riprendi" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></symbol>
+    <symbol id="i-sole" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-luna" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.5M12 7.6v.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-stella" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17l-5.7 3.2 1.2-6.3L2.8 9.5l6.4-.8z" fill="currentColor"/></symbol>
+  </svg>
+
+  <div class="striscia-data"><span id="data-striscia">Oggi</span> · <span data-orario>{{orari.pranzo}}</span></div>
+
+  <header class="testata">
+    <div class="logo">
+      <img class="logo-chiaro" src="assets/loghi/logo.webp" alt="{{nome}}, ristorante sulla spiaggia" width="92" height="60">
+      <img class="logo-scuro" src="assets/loghi/logo-scuro.webp" alt="" width="92" height="60">
+    </div>
+    <button type="button" class="tema" id="tema" aria-label="Passa al tema scuro" aria-pressed="false"><svg aria-hidden="true"><use href="#i-luna"/></svg></button>
+  </header>
+
+  <main id="contenuto" tabindex="-1">
+    <section class="apertura" aria-labelledby="titolo">
+      <div class="contenitore apertura-griglia">
+        <figure class="foto foto-tavolo">
+          <img src="assets/foto/tavolo-spiaggia-1200.webp" srcset="assets/foto/tavolo-spiaggia-720.webp 720w, assets/foto/tavolo-spiaggia-1200.webp 1200w" sizes="(min-width: 820px) 45vw, 100vw" alt="Tavoli apparecchiati sulla sabbia del {{nome}}, sotto la pergola" width="1200" height="899" fetchpriority="high" decoding="async">
+          <figcaption>Il tavolo sulla spiaggia</figcaption>
+        </figure>
+        <div>
+          <p class="oggi"><span>Oggi<span id="data-oggi"></span>, siamo aperti <span data-pasti>a pranzo</span> · <span data-orario>{{orari.pranzo}}</span></span></p>
+          <h1 id="titolo" data-titolo-lavoro="Pranzo sulla spiaggia, a un minuto dalla Domiziana. In un'ora sei di nuovo in strada." data-titolo-sosta="Pesce del Tirreno sulla spiaggia, a un minuto dalla Domiziana.">Pranzo sulla spiaggia, a un minuto dalla Domiziana. Aperti anche oggi.</h1>
+          <p class="sottotitolo">Pesce del Tirreno e prezzi scritti qui, prima di entrare. A pranzo siamo aperti tutti i giorni, anche d'inverno.</p>
+          <ul class="certezze" aria-label="In breve">
+            <li><svg aria-hidden="true"><use href="#i-spunta"/></svg><span>Aperti oggi</span></li>
+            <li><svg aria-hidden="true"><use href="#i-spunta"/></svg><span>A {{indirizzo.distanza}} dalla Domiziana</span></li>
+            <li><svg aria-hidden="true"><use href="#i-spunta"/></svg><span>In un'ora, o in {{menu.smart.minuti}} minuti se hai fretta</span></li>
+            <li><svg aria-hidden="true"><use href="#i-spunta"/></svg><span>Prezzi scritti prima di entrare</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sezione" aria-label="Le due strade">
+      <div class="contenitore strade-griglia">
+
+        <article class="scheda scheda-lavoro">
+          <div class="icona" aria-hidden="true"><svg><use href="#i-valigetta"/></svg></div>
+          <h2>Sei in pausa pranzo?</h2>
+          <p><strong class="etichetta">{{menu.smart.nome}}, {{menu.smart.prezzo}}</strong>: un piatto a scelta tra {{menu.smart.scelteN}}, con {{menu.smart.inclusi}}, {{menu.smart.giorni}}. Dillo al cameriere quando ti siedi: ti serviamo in {{menu.smart.minuti}} minuti.</p>
+          <p class="scelte">I {{menu.smart.scelteN}} piatti: {{menu.smart.scelte}}.</p>
+          <p><strong class="etichetta">{{menu.plus.nome}}, {{menu.plus.prezzo}}</strong>: un primo a scelta tra {{menu.plus.primiN}} e un secondo tra {{menu.plus.secondiN}}, con {{menu.plus.inclusi}}, {{menu.plus.giorni}}. Servito in {{menu.plus.minuti}} minuti.</p>
+          <p class="scelte">Primi: {{menu.plus.primi}}. Secondi: {{menu.plus.secondi}}.</p>
+          <p>Fattura al tavolo, subito.<br><strong>Porti un cliente?</strong> Ti riserviamo un tavolo tranquillo sulla spiaggia, dove si parla.</p>
+          <a class="btn btn-scuro btn-largo" data-azione="whatsapp-lavoro" href="{{link.lavoro}}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp: arrivo per pranzo</a>
+        </article>
+
+        <article class="scheda scheda-sosta">
+          <div class="icona" aria-hidden="true"><svg><use href="#i-auto"/></svg></div>
+          <h2>Sei in viaggio?</h2>
+          <p><strong>Se passi di qui una volta sola, ordina questi:</strong></p>
+          <ul class="piatti">
+            {{{menu.allaCarta}}}
+          </ul>
+          <p class="nota-prezzi">Prezzi IVA inclusa. {{menu.coperto.descrizione}}: {{menu.coperto.prezzo}} a persona; nei menu {{menu.smart.nome}} e {{menu.plus.nome}} sono già compresi.</p>
+          <p><strong>Con i bambini?</strong> C'è il menù baby, e mentre aspettate possono sgranchirsi le gambe in spiaggia.</p>
+          <a class="btn btn-scuro btn-largo" data-azione="whatsapp-sosta" href="{{link.sosta}}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp: siamo in viaggio, arriviamo</a>
+        </article>
+
+      </div>
+    </section>
+
+    <div class="ornamento" aria-hidden="true"><span></span></div>
+
+    <section class="sezione" aria-labelledby="titolo-cucina">
+      <div class="contenitore cucina-griglia">
+        <div>
+          <span class="occhiello">La cucina</span>
+          <h2 class="titolo-sezione" id="titolo-cucina">Perché da noi non trovi le vongole veraci</h2>
+          <p>Le abbiamo tolte dal menù: oggi sono quasi tutte d'allevamento e hanno perso il sapore di una volta. Al loro posto usiamo i lupini pescati nel nostro Tirreno.</p>
+          <p>Chiedi a {{chiRacconta}} di raccontarti il resto.</p>
+        </div>
+        <figure class="foto foto-cucina">
+          <img src="assets/foto/tavolo-terrazza-1200.webp" srcset="assets/foto/tavolo-terrazza-720.webp 720w, assets/foto/tavolo-terrazza-1200.webp 1200w" sizes="(min-width: 820px) 45vw, 100vw" alt="Tavolo apparecchiato sulla terrazza del {{nome}}: tovaglia bianca, tovaglioli, bicchieri e una piantina" width="1200" height="900" loading="lazy" decoding="async">
+          <figcaption>Il tavolo, sulla terrazza</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="terrazza" aria-label="La terrazza sulla spiaggia">
+      <div class="contenitore terrazza-griglia">
+        <figure class="foto foto-terrazza">
+          <img src="assets/foto/terrazza-mare-720.webp" srcset="assets/foto/terrazza-mare-720.webp 720w, assets/foto/terrazza-mare-1200.webp 1200w" sizes="(min-width: 1120px) 520px, 50vw" alt="La terrazza del {{nome}} sotto la pergola di canne, con il mare e gli ombrelloni sullo sfondo" width="1200" height="800" loading="lazy" decoding="async">
+          <figcaption>La terrazza, con il mare davanti</figcaption>
+        </figure>
+        <figure class="foto foto-terrazza">
+          <img src="assets/foto/terrazza-pergola-720.webp" srcset="assets/foto/terrazza-pergola-720.webp 720w, assets/foto/terrazza-pergola-1200.webp 1200w" sizes="(min-width: 1120px) 520px, 50vw" alt="I tavoli della terrazza del {{nome}} sotto la pergola di canne, con le palme" width="1200" height="800" loading="lazy" decoding="async">
+          <figcaption>Sotto la pergola di canne</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="ornamento" aria-hidden="true"><span></span></div>
+
+    <section class="sezione" aria-labelledby="titolo-prova" id="sezione-prova" hidden>
+      <div class="contenitore">
+        <span class="occhiello">Le recensioni</span>
+        <h2 class="titolo-sezione" id="titolo-prova">Le recensioni dei nostri clienti su Google</h2>
+        <div class="recensioni-giostra" id="recensioni-giostra" role="region" aria-roledescription="giostra" aria-label="Recensioni dei clienti">
+          <div class="recensioni" id="recensioni" aria-live="off"></div>
+          <div class="recensioni-comandi" id="recensioni-comandi" role="group" aria-label="Comandi delle recensioni" hidden>
+            <button type="button" class="recensioni-freccia indietro" data-giostra="-1" aria-label="Recensioni precedenti"><svg aria-hidden="true"><use href="#i-freccia"/></svg></button>
+            <div class="recensioni-punti" id="recensioni-punti" role="group" aria-label="Posizione"></div>
+            <button type="button" class="recensioni-freccia" data-giostra="1" aria-label="Recensioni successive"><svg aria-hidden="true"><use href="#i-freccia"/></svg></button>
+            <button type="button" class="recensioni-freccia" id="recensioni-pausa" aria-pressed="false" aria-label="Ferma lo scorrimento automatico" hidden><svg aria-hidden="true"><use href="#i-pausa"/></svg></button>
+          </div>
+        </div>
+        <div class="recensioni-info" id="recensioni-info">
+          <p class="attribuzione-google">Voto e recensioni forniti da Google Maps</p>
+          <button type="button" class="nota-tasto" id="nota-tasto" aria-expanded="false" aria-controls="nota-recensioni"><svg aria-hidden="true"><use href="#i-info"/></svg>Come le scegliamo<svg class="nota-freccia" aria-hidden="true"><use href="#i-freccia"/></svg></button>
+          <div class="nota-scatola" id="nota-recensioni" aria-hidden="true"><div class="nota-interno"><p class="nota-recensioni">Selezione automatica tra le recensioni che Google fornisce per la scheda <span id="nome-scheda">«{{schedaGoogle}}»</span> (le più pertinenti, in italiano e in inglese): mostriamo solo quelle con almeno {{recensioni.stelleMinime}} stelle, senza espressioni negative e pubblicate da meno di due anni, e togliamo quelle i cui autori chiedono di non comparire. In evidenza prima una recensione sul servizio, una sul viaggio e una sul cibo, poi le altre (prima in italiano, poi per voto e data). I testi sono integrali, come scritti dagli autori. Non le verifichiamo noi: autenticità e regole sono di Google. Il voto medio e il numero totale comprendono tutte le recensioni, anche quelle non mostrate. <a href="termini.html#recensioni">Tutti i dettagli nei termini e condizioni</a></p></div></div>
+        </div>
+        <a class="link-oro" data-link="recensioni" href="{{link.recensioni}}" target="_blank" rel="noopener">Leggi tutte le recensioni su Google <svg aria-hidden="true"><use href="#i-freccia"/></svg></a>
+      </div>
+    </section>
+
+    <div class="ornamento" aria-hidden="true"><span></span></div>
+
+    <section class="sezione" aria-labelledby="titolo-domande">
+      <div class="contenitore">
+        <span class="occhiello">Domande frequenti</span>
+        <h2 class="titolo-sezione" id="titolo-domande">Prima di metterti in strada</h2>
+        <dl class="domande">
+          <div><dt>Siete aperti oggi?</dt><dd>Sì. {{orari.frase}}. Salvo chiusure straordinarie per maltempo o eventi: in caso di dubbio chiama, o guarda gli orari sulla scheda Google.</dd></div>
+          <div><dt>Quanto siete lontani dalla Domiziana?</dt><dd>{{indirizzo.distanza}}, un minuto di macchina dalla via Domiziana.</dd></div>
+          <div><dt>Quanto ci vuole a pranzo?</dt><dd>Un'ora con calma, {{menu.smart.minuti}} minuti con il menù {{menu.smart.nome}}.</dd></div>
+          <div><dt>Fate fattura?</dt><dd>Sì, al tavolo, subito.</dd></div>
+          <div><dt>Si paga con la carta?</dt><dd>Sì, con tutte le carte (bancomat, credito, prepagate) e in contanti.</dd></div>
+          <div><dt>Devo prenotare?</dt><dd>No. Se scrivi su WhatsApp prima di partire ti teniamo un tavolo, se disponibile, e ti rispondiamo per conferma.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="chiusura" aria-labelledby="titolo-chiusura">
+      <div class="contenitore">
+        <span class="occhiello">Offerta di benvenuto</span>
+        <h2 class="titolo-sezione" id="titolo-chiusura">Stai passando dalla Domiziana?</h2>
+        <p class="invito">Scrivici su WhatsApp prima di arrivare: ti facciamo trovare il tavolo pronto (ti confermiamo con un messaggio) e <strong>il caffè te lo offriamo noi</strong> ({{offerta}}; <a href="termini.html#offerta">condizioni</a>).</p>
+        <div class="azioni">
+          <a class="btn btn-scuro" data-azione="whatsapp-generico" href="{{link.generico}}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp</a>
+          <a class="btn btn-oro" data-azione="portami-li" href="{{link.maps}}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Portami lì</a>
+        </div>
+        <p class="indirizzo">{{nome}} · {{{indirizzo.via}}} · {{indirizzo.cap}} {{indirizzo.comune}} ({{indirizzo.provincia}}) · a {{indirizzo.distanza}} dalla via Domiziana</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenitore">
+      <p>© {{anno}} {{nome}} · {{{titolare.ragioneSociale}}} · P.IVA {{{titolare.partitaIva}}} · {{indirizzo.comune}} ({{indirizzo.provincia}})</p>
+      <nav aria-label="Note legali"><a href="termini.html">Termini e condizioni</a> · <a href="privacy.html">Privacy</a> · <a href="cookie.html">Cookie</a> <a href="#" id="preferenze-cookie" hidden>· Preferenze cookie</a></nav>
+    </div>
+  </footer>
+
+  <div class="consenso" id="consenso" role="region" aria-label="Uso dei cookie" hidden>
+    <div class="consenso-scatola">
+      <button type="button" class="consenso-chiudi" data-consenso="rifiutati" aria-label="Chiudi e mantieni le impostazioni predefinite: nessun cookie di marketing">&times;</button>
+      <p><strong>Cookie per misurare gli annunci.</strong> Se accetti, Google Ads registra la visita e le azioni sui pulsanti (indicazioni, chiamata, WhatsApp) per capire quali annunci funzionano. Senza il tuo consenso non installiamo alcun cookie: chiudendo il banner con la X resti con le impostazioni predefinite. Puoi cambiare idea da "Preferenze cookie" in fondo alla pagina. <a href="cookie.html">Cookie policy</a> · <a href="privacy.html">Privacy</a></p>
+      <div class="consenso-azioni">
+        <button type="button" class="btn btn-oro" data-consenso="rifiutati">Rifiuta</button>
+        <button type="button" class="btn btn-oro" data-consenso="accettati">Accetta</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="barra" aria-label="Azioni rapide">
+    <div class="barra-vetro" aria-hidden="true"></div>
+    <div class="barra-interno">
+      <a class="btn btn-oro" data-azione="portami-li" href="{{link.maps}}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-pin"/></svg>Portami lì</a>
+      <a class="btn btn-contorno" data-azione="chiama" href="{{telefonoLink}}"><svg aria-hidden="true"><use href="#i-telefono"/></svg>Chiama</a>
+      <a class="btn btn-scuro" data-azione="whatsapp-generico" href="{{link.generico}}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp</a>
+    </div>
+  </nav>
+
+  <script type="application/json" id="dati">{{{datiPagina}}}</script>
+  <script type="module" src="assets/pagina.js"></script>
+</body>
+</html>

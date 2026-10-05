@@ -17,7 +17,7 @@ header('X-Content-Type-Options: nosniff');
 
 $config = leggiConfig();
 $chiave = trim((string) ($config['api_key'] ?? ''));
-$fixture = getenv('PLACES_FIXTURE') ?: ''; // solo per le prove senza rete (variabile d'ambiente, non impostabile dal web)
+$fixture = PHP_SAPI === 'cli' ? (getenv('PLACES_FIXTURE') ?: '') : ''; // solo per i test, mai dal web
 $file = percorsoRecensioni();
 $stato = 'non-necessario';
 

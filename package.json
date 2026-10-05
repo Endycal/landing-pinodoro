@@ -1,0 +1,15 @@
+{
+  "name": "landing-domiziana",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Landing \"Pranzo sulla Domiziana\" del Lido Pino d'Oro: pagina statica generata da data/ e src/",
+  "type": "module",
+  "engines": { "node": ">=20.10" },
+  "scripts": {
+    "build": "node scripts/costruisci.mjs",
+    "build:hostinger": "node scripts/costruisci.mjs --hostinger",
+    "recensioni": "node scripts/aggiorna-recensioni.mjs",
+    "dev": "node scripts/costruisci.mjs && node scripts/servi.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}

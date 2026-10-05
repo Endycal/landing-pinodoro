@@ -1,0 +1,24 @@
+{
+  "id": "ChIJ_ESEMPIO_PLACE_ID",
+  "displayName": { "text": "Lido Pino d'Oro", "languageCode": "it" },
+  "rating": 4.6,
+  "userRatingCount": 557,
+  "googleMapsUri": "https://maps.google.com/?cid=1234567890",
+  "reviews": [
+    { "rating": 5, "relativePublishTimeDescription": "2 settimane fa", "publishTime": "2026-09-10T12:00:00Z", "googleMapsUri": "https://www.google.com/maps/reviews/1",
+      "authorAttribution": { "displayName": "Marco Rossi" },
+      "text": { "text": "Pausa pranzo di lavoro perfetta: servizio veloce e cortese, in mezz'ora eravamo di nuovo in strada. Fattura al tavolo senza problemi.", "languageCode": "it" } },
+    { "rating": 5, "relativePublishTimeDescription": "un mese fa", "publishTime": "2026-08-20T12:00:00Z", "googleMapsUri": "https://www.google.com/maps/reviews/2",
+      "authorAttribution": { "displayName": "Giulia Bianchi" },
+      "text": { "text": "Eravamo di passaggio sulla Domiziana con i bambini, sosta improvvisata e tutti contenti: menu baby e spiaggia mentre aspettavamo. Torneremo di sicuro. <b>test</b>", "languageCode": "it" } },
+    { "rating": 4, "relativePublishTimeDescription": "3 mesi fa", "publishTime": "2026-06-15T12:00:00Z", "googleMapsUri": "https://www.google.com/maps/reviews/3",
+      "authorAttribution": { "displayName": "Antonio" },
+      "text": { "text": "Spaghetti ai lupini ottimi, pesce fresco e porzioni giuste. Il proprietario ci ha raccontato la storia dei lupini del Tirreno, una chicca. Prezzi chiari sul menu, nessuna sorpresa alla fine, e il caffe offerto. Una lunga recensione per provare che il testo oltre i trecentoventi caratteri venga accorciato correttamente con i puntini e il link per leggere tutto su Google, senza tagliare le parole a meta e senza rompere la grafica della scheda.", "languageCode": "it" } },
+    { "rating": 2, "relativePublishTimeDescription": "5 mesi fa", "publishTime": "2026-04-01T12:00:00Z", "googleMapsUri": "https://www.google.com/maps/reviews/4",
+      "authorAttribution": { "displayName": "Luca Verdi" },
+      "text": { "text": "Servizio lento e piatti nella media, non ci tornerei.", "languageCode": "it" } },
+    { "rating": 5, "relativePublishTimeDescription": "un anno fa", "publishTime": "2025-08-01T12:00:00Z", "googleMapsUri": "https://www.google.com/maps/reviews/5",
+      "authorAttribution": { "displayName": "Sara De Luca" },
+      "text": { "text": "Bello", "languageCode": "it" } }
+  ]
+}

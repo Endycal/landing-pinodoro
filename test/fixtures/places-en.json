@@ -1,0 +1,89 @@
+{
+ "reviews": [
+  {
+   "rating": 5,
+   "relativePublishTimeDescription": "3 months ago",
+   "publishTime": "2026-06-20T12:00:00Z",
+   "googleMapsUri": "https://www.google.com/maps/reviews/en1",
+   "authorAttribution": {
+    "displayName": "Sandra Maloney"
+   },
+   "text": {
+    "text": "Lovely service, not many places open in Mondragone in winter but this one was and the fish was excellent.",
+    "languageCode": "en"
+   },
+   "originalText": {
+    "text": "Lovely service, not many places open in Mondragone in winter but this one was and the fish was excellent.",
+    "languageCode": "en"
+   }
+  },
+  {
+   "rating": 4,
+   "relativePublishTimeDescription": "a year ago",
+   "publishTime": "2025-08-01T12:00:00Z",
+   "googleMapsUri": "https://www.google.com/maps/reviews/en2",
+   "authorAttribution": {
+    "displayName": "Ben Marra"
+   },
+   "text": {
+    "text": "Bit pricier than those around but cannot fault the food, right on the beach.",
+    "languageCode": "en"
+   },
+   "originalText": {
+    "text": "Bit pricier than those around but cannot fault the food, right on the beach.",
+    "languageCode": "en"
+   }
+  },
+  {
+   "rating": 5,
+   "relativePublishTimeDescription": "2 weeks ago",
+   "publishTime": "2026-09-14T12:00:00Z",
+   "googleMapsUri": "https://www.google.com/maps/reviews/en3",
+   "authorAttribution": {
+    "displayName": "Ferdinando Tipaldi"
+   },
+   "text": {
+    "text": "Top",
+    "languageCode": "en"
+   },
+   "originalText": {
+    "text": "Top",
+    "languageCode": "en"
+   }
+  },
+  {
+   "rating": 5,
+   "relativePublishTimeDescription": "5 months ago",
+   "publishTime": "2026-04-10T12:00:00Z",
+   "googleMapsUri": "https://www.google.com/maps/reviews/ru1",
+   "authorAttribution": {
+    "displayName": "Екатерина Барабаш"
+   },
+   "text": {
+    "text": "We were here for dinner, seafood and salmon, everything fresh.",
+    "languageCode": "en"
+   },
+   "originalText": {
+    "text": "Мы были здесь на ужин, брали морепродукты и лосось, все свежее.",
+    "languageCode": "ru"
+   }
+  },
+  {
+   "rating": 5,
+   "relativePublishTimeDescription": "2 months ago",
+   "publishTime": "2026-07-16T19:27:47Z",
+   "googleMapsUri": "https://www.google.com/maps/reviews/2",
+   "authorAttribution": {
+    "displayName": "Giulia Bianchi"
+   },
+   "text": {
+    "text": "A beautiful discovery (translated).",
+    "languageCode": "en"
+   },
+   "originalText": {
+    "text": "Una bellissima scoperta.",
+    "languageCode": "it"
+   }
+  }
+ ]
+}
