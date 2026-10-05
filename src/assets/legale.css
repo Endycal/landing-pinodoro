@@ -1,5 +1,4 @@
-/* Stile delle pagine legali (termini.html, privacy.html, cookie.html): stessi colori, caratteri e temi della landing.
-   Le variabili sono le stesse di index.html: se cambi un colore la', cambialo anche qui. */
+/* Stile delle pagine legali: stessi colori, caratteri e temi della landing (variabili uguali a stile.css). */
 
 @font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400 600; font-display: swap; src: url(caratteri/montserrat.woff2) format('woff2'); }
 @font-face { font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 500 600; font-display: swap; src: url(caratteri/cormorant-garamond.woff2) format('woff2'); }
@@ -71,6 +70,14 @@ a { color: var(--oro-testo); text-decoration: none; border-bottom: 1px solid var
 a:hover { border-bottom-color: var(--oro-testo); }
 strong { font-weight: 600; }
 img { max-width: 100%; display: block; }
+:focus-visible { outline: 2px solid var(--oro-testo); outline-offset: 2px; }
+main:focus { outline: none; }
+
+.salta {
+  position: absolute; left: 1rem; top: -100%; z-index: 60; padding: .6rem 1rem; border-radius: 999px; border: 0;
+  background: var(--oro-scuro); color: var(--bianco); font-size: .8rem; font-weight: 600;
+}
+.salta:focus { top: .6rem; }
 
 .testata {
   height: 84px; display: flex; align-items: center; justify-content: center;
@@ -99,6 +106,7 @@ img { max-width: 100%; display: block; }
 .legale ul, .legale ol { margin: .5rem 0 .5rem 1.2rem; }
 .legale li + li { margin-top: .3rem; }
 .riquadro { background: var(--superficie); border: 1px solid var(--linea); border-radius: 14px; padding: 1rem 1.2rem; margin: .8rem 0; }
+/* Dato del titolare ancora da inserire in data/restaurant.json */
 .dc { background: var(--evidenza); border-bottom: 1px dashed var(--oro-testo); padding: 0 .15em; border-radius: 2px; }
 
 .tabella { width: 100%; border-collapse: collapse; margin: .8rem 0; font-size: .86rem; }

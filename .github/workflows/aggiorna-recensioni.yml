@@ -1,9 +1,7 @@
 # Ogni mattina (05:23 UTC = 7:23 ora italiana d'estate, 6:23 d'inverno) scarica le recensioni della scheda Google
-# (Places API) e ripubblica la pagina con il file aggiornato. recensioni.json non viene mai salvato nel repository:
-# viene generato al momento della pubblicazione (cosi' le recensioni non restano nella cronologia pubblica di git).
-# Si puo' lanciare a mano in qualsiasi momento da Actions > "Aggiorna le recensioni Google".
-# Prima di funzionare servono: il secret GOOGLE_PLACES_API_KEY e la variabile GOOGLE_PLACE_ID
-# (Settings > Secrets and variables > Actions). Vedi README.md, "Recensioni Google automatiche".
+# (Places API) e ripubblica la pagina con il file aggiornato. recensioni.json non entra mai nel repository.
+# Si può lanciare a mano da Actions > "Aggiorna le recensioni Google". Servono il secret GOOGLE_PLACES_API_KEY
+# e, facoltativa, la variabile GOOGLE_PLACE_ID (altrimenti vale quello di data/restaurant.json).
 name: Aggiorna le recensioni Google
 
 on:
@@ -29,14 +27,17 @@ jobs:
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v4
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Scarica le recensioni dalla scheda Google
         env:
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
           GOOGLE_PLACE_ID: ${{ vars.GOOGLE_PLACE_ID }}
-          GOOGLE_PLACE_QUERY: ${{ vars.GOOGLE_PLACE_QUERY }}
         run: node scripts/aggiorna-recensioni.mjs
-      - name: Prepara i file da pubblicare
-        run: bash scripts/prepara-sito.sh
+      - name: Costruisci il sito
+        run: node scripts/costruisci.mjs
       - name: Configura Pages
         uses: actions/configure-pages@v5
       - name: Carica i file
@@ -55,14 +56,17 @@ jobs:
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v4
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Scarica le recensioni dalla scheda Google
         env:
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
           GOOGLE_PLACE_ID: ${{ vars.GOOGLE_PLACE_ID }}
-          GOOGLE_PLACE_QUERY: ${{ vars.GOOGLE_PLACE_QUERY }}
         run: node scripts/aggiorna-recensioni.mjs
-      - name: Prepara i file da caricare
-        run: bash scripts/prepara-sito.sh --hostinger
+      - name: Costruisci il sito per Hostinger
+        run: node scripts/costruisci.mjs --hostinger
       - name: Carica su Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

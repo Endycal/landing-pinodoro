@@ -6,7 +6,7 @@ DirectoryIndex index.html
 Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  # recensioni.json passa da recensioni.php, che lo rinnova da Google quando ha piu' di una settimana.
+  # recensioni.json passa da recensioni.php, che lo rinnova da Google quando ha più di un giorno.
   RewriteRule ^recensioni\.json$ recensioni.php [L]
 </IfModule>
 
@@ -21,7 +21,7 @@ Options -Indexes
 </FilesMatch>
 RedirectMatch 404 /(\.github|\.git|scripts)(/|$)
 
-# Il browser ricontrolla sempre le recensioni (il file cambia una volta a settimana).
+# Il browser ricontrolla sempre le recensioni (il file cambia ogni giorno).
 <IfModule mod_headers.c>
   <FilesMatch "^recensioni\.json$">
     Header set Cache-Control "no-cache"

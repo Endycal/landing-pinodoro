@@ -3,26 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Informativa sulla privacy | Lido Pino d'Oro</title>
-  <meta name="description" content="Informativa sul trattamento dei dati personali della pagina Pranzo sulla Domiziana del Lido Pino d'Oro.">
+  <title>Informativa sulla privacy | {{nome}}</title>
+  <meta name="description" content="Informativa sul trattamento dei dati personali della pagina Pranzo sulla Domiziana del {{nome}}.">
   <meta name="robots" content="noindex, follow">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <script>(function () { try { var t = localStorage.getItem("tema"); if (t === "scuro" || t === "chiaro") document.documentElement.setAttribute("data-tema", t); } catch (e) {} })();</script>
-  <link rel="stylesheet" href="legale.css">
+  <script>
+    (function () {
+      var scelta = null;
+      try { scelta = localStorage.getItem("tema"); } catch (errore) { scelta = null; }
+      if (scelta === "scuro" || scelta === "chiaro") document.documentElement.dataset.tema = scelta;
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/legale.css">
 </head>
 <body>
+  <a class="salta" href="#contenuto">Salta al contenuto</a>
   <header class="testata">
     <a href="./" class="logo" aria-label="Torna alla pagina Pranzo sulla Domiziana">
-      <img class="logo-chiaro" src="logo.png" alt="Lido Pino d'Oro, ristorante sulla spiaggia" width="92" height="60">
-      <img class="logo-scuro" src="logo-scuro.png" alt="" width="92" height="60">
+      <img class="logo-chiaro" src="assets/loghi/logo.webp" alt="{{nome}}, ristorante sulla spiaggia" width="92" height="60">
+      <img class="logo-scuro" src="assets/loghi/logo-scuro.webp" alt="" width="92" height="60">
     </a>
   </header>
 
-  <main class="contenitore legale">
+  <main class="contenitore legale" id="contenuto" tabindex="-1">
     <span class="occhiello">Note legali</span>
     <h1>Informativa sulla privacy</h1>
     <p class="aggiornato">Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (GDPR) · Ultimo aggiornamento: 1 ottobre 2026</p>
@@ -31,11 +38,10 @@
 
     <h2>1. Titolare del trattamento</h2>
     <div class="riquadro">
-      <p><strong>Lido Pino d'Oro</strong> di <span class="dc">[ragione sociale, oppure nome e cognome del titolare]</span><br>
-      <span class="dc">[via e numero civico]</span>, 81034 Mondragone (CE)<br>
-      Partita IVA <span class="dc">[00000000000]</span><br>
-      <span class="dc">[Solo se società: Registro delle imprese di Caserta n. ... Se ditta individuale: cancellare questa riga]</span><br>
-      PEC <span class="dc">[indirizzo PEC]</span> · e-mail <a href="mailto:infolidopinodoro@gmail.com">infolidopinodoro@gmail.com</a> · telefono <a href="tel:+393887877008">+39 388 787 7008</a></p>
+      <p><strong>{{nome}}</strong> di {{{titolare.ragioneSociale}}}<br>
+      {{{indirizzo.via}}}, {{indirizzo.cap}} {{indirizzo.comune}} ({{indirizzo.provincia}})<br>
+      Partita IVA {{{titolare.partitaIva}}}<br>
+      {{{titolare.registroImprese}}}PEC {{{titolare.pec}}} · e-mail <a href="mailto:{{email}}">{{email}}</a> · telefono <a href="{{telefonoLink}}">{{telefono}}</a></p>
     </div>
     <p>Non è stato nominato un responsabile della protezione dei dati, non essendo obbligatorio per la nostra attività.</p>
 
@@ -45,7 +51,7 @@
     <p>Quando visiti la pagina, i sistemi che la ospitano registrano automaticamente alcuni dati tecnici: indirizzo IP, data e ora della visita, pagina richiesta, tipo di browser e di sistema operativo. Servono a far funzionare il sito, a garantirne la sicurezza e a rilevare abusi.</p>
     <ul>
       <li><strong>Base giuridica:</strong> legittimo interesse del titolare alla sicurezza e al funzionamento del sito (art. 6, par. 1, lett. f, GDPR).</li>
-      <li><strong>Conservazione:</strong> la pagina è pubblicata in due copie (punto 3). Per la copia su <span class="dc">[dominio del sito, es. tuodominio.it/domiziana/]</span>, i registri di accesso sono conservati dal fornitore di hosting Hostinger per <span class="dc">[N giorni: verificare in hPanel o chiedere all'assistenza Hostinger]</span> e poi cancellati; non li usiamo per identificare i visitatori, salvo verifiche su abusi o richieste dell'autorità. Per la copia su ristorantepinodoro.github.io, i registri sono raccolti e conservati da GitHub, Inc. per le proprie finalità di sicurezza, per il periodo stabilito dalla sua informativa sulla privacy; noi non vi abbiamo accesso.</li>
+      <li><strong>Conservazione:</strong> la pagina è pubblicata in due copie (punto 3). Per la copia su {{{hosting.dominio}}}, i registri di accesso sono conservati dal fornitore di hosting Hostinger per {{{hosting.giorniConservazioneLog}}} giorni e poi cancellati; non li usiamo per identificare i visitatori, salvo verifiche su abusi o richieste dell'autorità. Per la copia su ristorantepinodoro.github.io, i registri sono raccolti e conservati da GitHub, Inc. per le proprie finalità di sicurezza, per il periodo stabilito dalla sua informativa sulla privacy; noi non vi abbiamo accesso.</li>
     </ul>
 
     <h3>b) Dati che ci comunichi contattandoci</h3>
@@ -64,15 +70,15 @@
       <li><strong>Finalità:</strong> informare i visitatori sulle esperienze dei clienti, mostrando le opinioni che gli autori hanno già reso pubbliche su Google.</li>
       <li><strong>Base giuridica:</strong> legittimo interesse del titolare a far conoscere la propria attività (art. 6, par. 1, lett. f, GDPR).</li>
       <li><strong>Conservazione:</strong> solo finché Google fornisce la recensione alla nostra pagina. A ogni aggiornamento, di norma ogni giorno, il file di dati della pagina viene riscritto con le recensioni che Google restituisce in quel momento; quelle non più fornite vengono eliminate. Nel file conserviamo solo le recensioni che rispettano i criteri di pubblicazione.</li>
-      <li><strong>Come avviene la selezione:</strong> in modo automatico, con criteri fissi (almeno 4 stelle, testo di lunghezza minima, lingua italiana o inglese, assenza di espressioni offensive o fortemente negative, pubblicazione da meno di due anni, assenza dall'elenco delle esclusioni richieste dagli autori). Non comporta alcuna decisione con effetti giuridici o significativi sugli autori.</li>
+      <li><strong>Come avviene la selezione:</strong> in modo automatico, con criteri fissi (almeno {{recensioni.stelleMinime}} stelle, testo di lunghezza minima, lingua italiana o inglese, assenza di espressioni offensive o fortemente negative, pubblicazione da meno di due anni, assenza dall'elenco delle esclusioni richieste dagli autori). Non comporta alcuna decisione con effetti giuridici o significativi sugli autori.</li>
     </ul>
-    <p>Google ci fornisce le recensioni senza alcun recapito degli autori: informarli uno per uno è impossibile o comporterebbe uno sforzo sproporzionato. Per questo, come previsto dall'articolo 14, paragrafo 5, lettera b), del GDPR, forniamo le informazioni sul trattamento rendendole pubbliche in questa pagina. Se sei l'autore di una recensione e non vuoi che compaia in questa pagina, scrivici a <a href="mailto:infolidopinodoro@gmail.com">infolidopinodoro@gmail.com</a>: la escludiamo dalla selezione al primo aggiornamento successivo, senza chiederti alcun motivo.</p>
+    <p>Google ci fornisce le recensioni senza alcun recapito degli autori: informarli uno per uno è impossibile o comporterebbe uno sforzo sproporzionato. Per questo, come previsto dall'articolo 14, paragrafo 5, lettera b), del GDPR, forniamo le informazioni sul trattamento rendendole pubbliche in questa pagina. Se sei l'autore di una recensione e non vuoi che compaia in questa pagina, scrivici a <a href="mailto:{{email}}">{{email}}</a>: la escludiamo dalla selezione al primo aggiornamento successivo, senza chiederti alcun motivo.</p>
 
     <h3>d) Misurazione delle campagne Google Ads (solo con il tuo consenso)</h3>
     <p>Se la misurazione delle campagne Google Ads è attiva, con il tuo consenso (dato tramite il banner sui cookie) la pagina carica il tag di Google. Il tag comunica a Google la visita alla pagina (indirizzo della pagina, compreso l'eventuale codice del gruppo di annunci e, se presente, l'identificativo dell'annuncio da cui provieni, pagina di provenienza, indirizzo IP, tipo di browser e dispositivo) e le azioni sui pulsanti (indicazioni stradali, chiamata, WhatsApp), per misurare quali annunci portano clienti al ristorante. Per farlo Google può installare cookie e usare identificatori, come descritto nella <a href="cookie.html">Cookie policy</a>.</p>
     <ul>
       <li><strong>Base giuridica:</strong> consenso (art. 6, par. 1, lett. a, GDPR), revocabile in ogni momento dal collegamento "Preferenze cookie" in fondo alla pagina.</li>
-      <li><strong>Modalità consenso:</strong> comunichiamo a Google che i dati possono essere usati per la misurazione degli annunci, non per personalizzarli né per statistiche (Consent Mode: ad_storage e ad_user_data concessi, ad_personalization e analytics_storage negati).</li>
+      <li><strong>Modalità consenso:</strong> il tag parte con ogni finalità negata e, con il tuo consenso, comunichiamo a Google che i dati possono essere usati solo per la misurazione degli annunci, non per personalizzarli né per statistiche (Consent Mode: ad_storage e ad_user_data concessi, ad_personalization e analytics_storage negati).</li>
       <li><strong>Senza consenso</strong> il tag non viene caricato e nessun dato viene inviato a Google. Se revochi il consenso, la pagina cancella i cookie di Google Ads impostati su questo dominio e si ricarica senza il tag.</li>
     </ul>
     <p>Google Ireland Limited tratta i dati secondo la propria <a href="https://policies.google.com/privacy?hl=it" rel="noopener" target="_blank">informativa sulla privacy</a>.</p>
@@ -82,7 +88,7 @@
 
     <h2>3. A chi comunichiamo i dati</h2>
     <ul>
-      <li><strong>Fornitori di hosting</strong>, che ospitano la pagina e ne registrano i dati di navigazione. La pagina è pubblicata in due copie: quella su <span class="dc">[dominio del sito, es. tuodominio.it/domiziana/]</span> è ospitata da <strong>Hostinger International Ltd.</strong>, Larnaca (Cipro), nel data center di <span class="dc">[paese dell'Unione europea scelto in hPanel]</span>, che tratta i dati per nostro conto come responsabile del trattamento (art. 28 GDPR) in base al suo <a href="https://www.hostinger.com/legal/dpa" rel="noopener" target="_blank">accordo sul trattamento dei dati</a>; quella su ristorantepinodoro.github.io è ospitata da <strong>GitHub, Inc.</strong>, San Francisco (USA), servizio GitHub Pages, che registra gli indirizzi IP dei visitatori per le proprie finalità di sicurezza come titolare autonomo, secondo la propria <a href="https://docs.github.com/it/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener" target="_blank">informativa sulla privacy</a>.</li>
+      <li><strong>Fornitori di hosting</strong>, che ospitano la pagina e ne registrano i dati di navigazione. La pagina è pubblicata in due copie: quella su {{{hosting.dominio}}} è ospitata da <strong>Hostinger International Ltd.</strong>, Larnaca (Cipro), nel data center di {{{hosting.dataCenter}}}, che tratta i dati per nostro conto come responsabile del trattamento (art. 28 GDPR) in base al suo <a href="https://www.hostinger.com/legal/dpa" rel="noopener" target="_blank">accordo sul trattamento dei dati</a>; quella su ristorantepinodoro.github.io è ospitata da <strong>GitHub, Inc.</strong>, San Francisco (USA), servizio GitHub Pages, che registra gli indirizzi IP dei visitatori per le proprie finalità di sicurezza come titolare autonomo, secondo la propria <a href="https://docs.github.com/it/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener" target="_blank">informativa sulla privacy</a>.</li>
       <li><strong>Fornitore del servizio di posta elettronica</strong>, che ospita la casella con cui riceviamo i messaggi e le richieste sui dati: Google Ireland Limited, Dublino (Irlanda), servizio Gmail.</li>
       <li><strong>WhatsApp Ireland Limited</strong> (gruppo Meta), titolare autonomo del servizio WhatsApp, se scegli di contattarci con WhatsApp.</li>
       <li><strong>Google Ireland Limited</strong>, inoltre, solo se acconsenti alla misurazione Google Ads, oppure se scegli di aprire Google Maps con i pulsanti "Portami lì", "Leggi tutte le recensioni su Google" e i collegamenti alle singole recensioni.</li>
@@ -95,9 +101,9 @@
     <h2>5. I tuoi diritti</h2>
     <p>Puoi chiederci in qualsiasi momento di accedere ai tuoi dati, di correggerli, di cancellarli, di limitarne il trattamento e di riceverli in un formato leggibile da una macchina (portabilità). Se il trattamento si basa sul consenso, puoi revocarlo in qualsiasi momento, senza che ciò pregiudichi la liceità del trattamento già svolto.</p>
     <div class="riquadro">
-      <p><strong>Diritto di opposizione (art. 21 GDPR).</strong> Per i trattamenti fondati sul nostro legittimo interesse, cioè i dati di navigazione (punto 2.a) e le recensioni prese dalla tua scheda Google (punto 2.c), puoi opporti in qualsiasi momento, per motivi connessi alla tua situazione particolare, scrivendo a <a href="mailto:infolidopinodoro@gmail.com">infolidopinodoro@gmail.com</a>. In caso di opposizione interrompiamo il trattamento, salvo che esistano motivi legittimi cogenti che prevalgono sui tuoi interessi. Se sei l'autore di una recensione non ti chiediamo alcun motivo: la escludiamo dalla pagina al primo aggiornamento successivo alla richiesta.</p>
+      <p><strong>Diritto di opposizione (art. 21 GDPR).</strong> Per i trattamenti fondati sul nostro legittimo interesse, cioè i dati di navigazione (punto 2.a) e le recensioni prese dalla tua scheda Google (punto 2.c), puoi opporti in qualsiasi momento, per motivi connessi alla tua situazione particolare, scrivendo a <a href="mailto:{{email}}">{{email}}</a>. In caso di opposizione interrompiamo il trattamento, salvo che esistano motivi legittimi cogenti che prevalgono sui tuoi interessi. Se sei l'autore di una recensione non ti chiediamo alcun motivo: la escludiamo dalla pagina al primo aggiornamento successivo alla richiesta.</p>
     </div>
-    <p>Per esercitare i diritti scrivi a <a href="mailto:infolidopinodoro@gmail.com">infolidopinodoro@gmail.com</a>. L'esercizio dei diritti è gratuito. Rispondiamo senza ingiustificato ritardo e comunque entro un mese dalla richiesta; se la richiesta è particolarmente complessa o se ne riceviamo molte, il termine può essere prorogato di due mesi: in tal caso ti avvisiamo entro il primo mese, spiegandone i motivi. Per tutelare i tuoi dati possiamo chiederti di confermare la tua identità, per esempio scrivendoci dallo stesso numero di telefono o profilo WhatsApp con cui ci hai contattato. Se ritieni che il trattamento violi la legge, puoi proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener" target="_blank">www.garanteprivacy.it</a>) o rivolgerti all'autorità giudiziaria.</p>
+    <p>Per esercitare i diritti scrivi a <a href="mailto:{{email}}">{{email}}</a>. L'esercizio dei diritti è gratuito. Rispondiamo senza ingiustificato ritardo e comunque entro un mese dalla richiesta; se la richiesta è particolarmente complessa o se ne riceviamo molte, il termine può essere prorogato di due mesi: in tal caso ti avvisiamo entro il primo mese, spiegandone i motivi. Per tutelare i tuoi dati possiamo chiederti di confermare la tua identità, per esempio scrivendoci dallo stesso numero di telefono o profilo WhatsApp con cui ci hai contattato. Se ritieni che il trattamento violi la legge, puoi proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener" target="_blank">www.garanteprivacy.it</a>) o rivolgerti all'autorità giudiziaria.</p>
 
     <h2>6. Minori</h2>
     <p>La pagina non è rivolta a minori di 14 anni e non raccogliamo consapevolmente loro dati.</p>
@@ -113,7 +119,7 @@
   </main>
 
   <footer class="pie">
-    <p>© 2026 Lido Pino d'Oro · Mondragone (CE)</p>
+    <p>© {{anno}} {{nome}} · {{indirizzo.comune}} ({{indirizzo.provincia}})</p>
   </footer>
 </body>
 </html>

@@ -31,7 +31,7 @@ function termina(int $codice, string $messaggio): never
 
 $config = leggiConfig();
 $token = trim((string) ($config['token'] ?? ''));
-$fixture = $daTerminale ? (getenv('PLACES_FIXTURE') ?: '') : ''; // solo per le prove senza rete
+$fixture = $daTerminale ? (getenv('PLACES_FIXTURE') ?: '') : ''; // solo per i test, mai dal web
 
 // Dal web serve il token: senza, o sbagliato, niente (cosi' nessuno puo' far consumare la quota Google).
 if (!$daTerminale) {

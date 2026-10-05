@@ -1,0 +1,70 @@
+{
+  "nome": "Lido Pino d'Oro",
+  "schedaGoogle": "Ristorante Pino D'Oro",
+  "titolare": {
+    "ragioneSociale": null,
+    "partitaIva": null,
+    "rea": null,
+    "registroImprese": null,
+    "titoliAbilitativi": null,
+    "pec": null
+  },
+  "indirizzo": {
+    "via": null,
+    "cap": "81034",
+    "comune": "Mondragone",
+    "provincia": "CE",
+    "distanzaDallaDomiziana": "300 metri"
+  },
+  "contatti": {
+    "telefono": "+39 388 787 7008",
+    "whatsapp": "393887877008",
+    "email": "infolidopinodoro@gmail.com"
+  },
+  "orari": {
+    "1": ["12:00-15:00"],
+    "2": ["12:00-15:00"],
+    "3": ["12:00-15:00"],
+    "4": ["12:00-15:00"],
+    "5": ["12:00-15:00", "19:30-23:00"],
+    "6": ["12:00-15:00", "19:30-23:30"],
+    "0": ["12:00-15:30"]
+  },
+  "servizi": {
+    "fatturaAlTavolo": true,
+    "carte": true,
+    "menuBaby": true
+  },
+  "persone": {
+    "chiRacconta": "Doriano"
+  },
+  "google": {
+    "placeId": "ChIJcV_Xya3fOhMRWT5u9UL0X08",
+    "adsId": "",
+    "conversioni": {
+      "portami-li": "",
+      "chiama": "",
+      "whatsapp-lavoro": "",
+      "whatsapp-sosta": "",
+      "whatsapp-generico": ""
+    }
+  },
+  "messaggiWhatsapp": {
+    "whatsapp-lavoro": "DOMIZIANA LAVORO – arrivo tra 10 minuti, siamo in [ ]",
+    "whatsapp-sosta": "DOMIZIANA SOSTA – arriviamo tra 10 minuti, siamo in [ ] (bambini: [ ])",
+    "whatsapp-generico": "DOMIZIANA – arrivo tra 10 minuti, siamo in [ ]"
+  },
+  "recensioni": {
+    "rotazioneSecondi": 7,
+    "stelleMinime": 4
+  },
+  "hosting": {
+    "dominio": null,
+    "dataCenter": null,
+    "giorniConservazioneLog": null
+  },
+  "sitoPrincipale": {
+    "dominio": null,
+    "cookiePolicy": null
+  }
+}

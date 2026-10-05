@@ -1,0 +1,56 @@
+{
+  "aggiornato": "2026-10-05",
+  "coperto": {
+    "prezzo": 2.0,
+    "descrizione": "Pane, coperto e servizio"
+  },
+  "smart": {
+    "nome": "SMART",
+    "prezzo": 16.7,
+    "scelte": [
+      "Tagliolini Sciuè Sciuè",
+      "Spaghetti ai Lupini locali",
+      "Mezzi Paccheri alla Pescatora Light",
+      "Strozzapreti al Ragù",
+      "Salmone in Crosta"
+    ],
+    "inclusi": "acqua, caffè, servizio, pane e coperto",
+    "giorni": "dal lunedì al venerdì, esclusi i festivi",
+    "minuti": 30
+  },
+  "plus": {
+    "nome": "PLUS",
+    "prezzo": 25.7,
+    "primi": [
+      "Spaghetti ai Lupini locali",
+      "Tagliolini Sciuè Sciuè",
+      "Mezzi Paccheri alla Pescatora Light",
+      "Strozzapreti al Ragù"
+    ],
+    "secondi": [
+      "Frittura di Calamari e Gamberi",
+      "Salmone in Crosta",
+      "Cotolettona di Manzo con Patatine"
+    ],
+    "inclusi": "acqua, caffè, servizio, pane e coperto",
+    "giorni": "dal lunedì al venerdì, esclusi i festivi",
+    "minuti": 45
+  },
+  "allaCarta": [
+    {
+      "nome": "Spaghetti ai Lupini locali",
+      "prezzo": 16.5
+    },
+    {
+      "nome": "Frittura di Alici locali",
+      "prezzo": 13.0
+    },
+    {
+      "nome": "Salmone al Falerno",
+      "prezzo": 18.0
+    }
+  ],
+  "offerta": {
+    "caffe": "un caffè a persona per chi pranza"
+  }
+}
