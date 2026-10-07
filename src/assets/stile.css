@@ -133,7 +133,6 @@ main:focus { outline: none; }
 .btn-oro:hover { box-shadow: 0 16px 34px rgba(201, 162, 39, .45); }
 .btn-contorno { border-color: var(--oro); color: var(--oro-testo); background: var(--superficie-velata); }
 .btn-contorno:hover { background: var(--superficie); }
-.btn-scuro { background: var(--oro-scuro); color: var(--bianco); box-shadow: 0 10px 26px rgba(165, 130, 26, .3); }
 .btn-largo { width: 100%; }
 
 .striscia-data {
